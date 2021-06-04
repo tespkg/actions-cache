@@ -1,0 +1,55 @@
+name: actions-cache
+author: tespkg
+description: zip and upload deps in S3
+inputs:
+  endpoint:
+    description: "s3 / minio endpoint, see: https://docs.min.io/docs/javascript-client-api-reference.html"
+    required: false
+    default: s3.amazonaws.com
+  port:
+    description: minio port
+    required: false
+  insecure:
+    description: use insecure http connection to minio
+    required: false
+  accessKey:
+    description: s3 / minio accessKey
+    required: true
+  secretKey:
+    description: s3 / minio secretKey
+    required: true
+  bucket:
+    description: s3 / minio bucket
+    required: true
+  path:
+    description: "A list of files, directories, and wildcard patterns to cache and restore"
+    required: true
+  key:
+    description: "An explicit key for restoring and saving the cache"
+    required: true
+  restore-keys:
+    description: "An ordered list of keys to use for restoring the cache if no cache hit occurred for key"
+    required: false
+  use-fallback:
+    description: "Use github actions/cache as fallback"
+    required: false
+    default: "true"
+  # zip-option:
+  #   description: zip options
+  #   required: false
+  #   default: -ryq
+  # unzip-option:
+  #   description: unzip options
+  #   required: false
+  #   default: -n
+outputs:
+  cache-hit:
+    description: 'A boolean value to indicate an exact match was found for the primary key'
+runs:
+  using: node12
+  main: "dist/restore/index.js"
+  post: "dist/save/index.js"
+  post-if: "success()"
+branding:
+  icon: "archive"
+  color: "gray-dark"
