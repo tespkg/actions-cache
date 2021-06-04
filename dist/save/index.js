@@ -76059,9 +76059,9 @@ function saveCache() {
                 if (core.isDebug()) {
                     yield tar_1.listTar(archivePath, compressionMethod);
                 }
-                core.debug(`uploading tar to s3: ${bucket}, ${key}`);
+                core.debug(`Uploading tar to s3. Bucket: ${bucket}, Object: ${key}`);
                 yield mc.fPutObject(bucket, key, archivePath, {});
-                core.info("Cache saved successfully");
+                core.info("Cache saved to s3 successfully");
             }
             catch (e) {
                 core.info("save s3 cache failed: " + e.message);
