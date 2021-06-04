@@ -40,7 +40,7 @@ async function restoreCache() {
         await listTar(archivePath, compressionMethod);
       }
 
-      core.info(`Cache Size: ~${formatSize(stat.size)} MB (${stat.size} B)`);
+      core.info(`Cache Size: ${formatSize(stat.size)} (${stat.size} bytes)`);
 
       await extractTar(archivePath, compressionMethod);
       core.info("Cache restored from s3 successfully");

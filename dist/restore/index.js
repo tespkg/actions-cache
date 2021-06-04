@@ -80208,7 +80208,7 @@ function restoreCache() {
                 if (core.isDebug()) {
                     yield tar_1.listTar(archivePath, compressionMethod);
                 }
-                core.info(`Cache Size: ~${utils_1.formatSize(stat.size)} MB (${stat.size} B)`);
+                core.info(`Cache Size: ${utils_1.formatSize(stat.size)} (${stat.size} bytes)`);
                 yield tar_1.extractTar(archivePath, compressionMethod);
                 core.info("Cache restored from s3 successfully");
                 utils_1.setCacheHitOutput(true);
