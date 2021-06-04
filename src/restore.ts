@@ -8,6 +8,7 @@ import {
   getInputAsArray,
   getInputAsBoolean,
   newMinio,
+  setCacheHitOutput,
 } from "./utils";
 
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
@@ -41,15 +42,18 @@ async function restoreCache() {
 
       await extractTar(archivePath, compressionMethod);
       core.info("Cache restored from s3 successfully");
+      setCacheHitOutput(true);
     } catch (e) {
       core.info("restore s3 cache failed: " + e.message);
+      setCacheHitOutput(false);
       if (useFallback) {
         core.info("restore cache using fallback cache");
         await cache.restoreCache(paths, key, restoreKeys);
+        setCacheHitOutput(true);
       }
     }
   } catch (e) {
-    core.info("warning: " + e.message);
+    core.setFailed(e.message);
   }
 }
 

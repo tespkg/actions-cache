@@ -52,3 +52,7 @@ export function formatSize(value?: number, format = "bi") {
     (exp ? (k + "MGTPEZY")[exp - 1] + suffix : "byte" + (size !== 1 ? "s" : ""))
   );
 }
+
+export function setCacheHitOutput(isCacheHit: boolean): void {
+  core.setOutput("cache-hit", isCacheHit.toString());
+}

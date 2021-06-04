@@ -6307,7 +6307,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = void 0;
+exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = void 0;
 const core = __importStar(__webpack_require__(470));
 const minio = __importStar(__webpack_require__(223));
 function newMinio() {
@@ -6352,6 +6352,10 @@ function formatSize(value, format = "bi") {
         (exp ? (k + "MGTPEZY")[exp - 1] + suffix : "byte" + (size !== 1 ? "s" : "")));
 }
 exports.formatSize = formatSize;
+function setCacheHitOutput(isCacheHit) {
+    core.setOutput("cache-hit", isCacheHit.toString());
+}
+exports.setCacheHitOutput = setCacheHitOutput;
 
 
 /***/ }),
@@ -80207,17 +80211,20 @@ function restoreCache() {
                 core.info(`Cache Size: ~${utils_1.formatSize(stat.size)} MB (${stat.size} B)`);
                 yield tar_1.extractTar(archivePath, compressionMethod);
                 core.info("Cache restored from s3 successfully");
+                utils_1.setCacheHitOutput(true);
             }
             catch (e) {
                 core.info("restore s3 cache failed: " + e.message);
+                utils_1.setCacheHitOutput(false);
                 if (useFallback) {
                     core.info("restore cache using fallback cache");
                     yield cache.restoreCache(paths, key, restoreKeys);
+                    utils_1.setCacheHitOutput(true);
                 }
             }
         }
         catch (e) {
-            core.info("warning: " + e.message);
+            core.setFailed(e.message);
         }
     });
 }
