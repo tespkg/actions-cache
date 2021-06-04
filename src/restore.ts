@@ -30,7 +30,9 @@ async function restoreCache() {
         utils.getCacheFileName(compressionMethod)
       );
 
-      core.debug(`downloading cache from s3 to ${archivePath}`);
+      core.debug(
+        `downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${key}`
+      );
       const stat = await mc.statObject(bucket, key);
       await mc.fGetObject(bucket, key, archivePath);
 

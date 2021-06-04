@@ -35,7 +35,7 @@ async function saveCache() {
         await listTar(archivePath, compressionMethod);
       }
 
-      core.debug(`Uploading tar to s3. Bucket: ${bucket}, Object: ${key}`);
+      core.info(`Uploading tar to s3. Bucket: ${bucket}, Object: ${key}`);
       await mc.fPutObject(bucket, key, archivePath, {});
       core.info("Cache saved to s3 successfully");
     } catch (e) {

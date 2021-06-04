@@ -76063,7 +76063,7 @@ function saveCache() {
                 if (core.isDebug()) {
                     yield tar_1.listTar(archivePath, compressionMethod);
                 }
-                core.debug(`Uploading tar to s3. Bucket: ${bucket}, Object: ${key}`);
+                core.info(`Uploading tar to s3. Bucket: ${bucket}, Object: ${key}`);
                 yield mc.fPutObject(bucket, key, archivePath, {});
                 core.info("Cache saved to s3 successfully");
             }

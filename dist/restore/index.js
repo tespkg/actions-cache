@@ -80202,7 +80202,7 @@ function restoreCache() {
                 const mc = utils_1.newMinio();
                 const compressionMethod = yield utils.getCompressionMethod();
                 const archivePath = path.join(yield utils.createTempDirectory(), utils.getCacheFileName(compressionMethod));
-                core.debug(`downloading cache from s3 to ${archivePath}`);
+                core.debug(`downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${key}`);
                 const stat = yield mc.statObject(bucket, key);
                 yield mc.fGetObject(bucket, key, archivePath);
                 if (core.isDebug()) {
