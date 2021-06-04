@@ -80212,8 +80212,8 @@ function restoreCache() {
                 }
                 core.info(`Cache Size: ${utils_1.formatSize(stat.size)} (${stat.size} bytes)`);
                 yield tar_1.extractTar(archivePath, compressionMethod);
-                core.info("Cache restored from s3 successfully");
                 utils_1.setCacheHitOutput(true);
+                core.info("Cache restored from s3 successfully");
             }
             catch (e) {
                 core.info("restore s3 cache failed: " + e.message);
@@ -80222,6 +80222,7 @@ function restoreCache() {
                     core.info("restore cache using fallback cache");
                     if (yield cache.restoreCache(paths, key, restoreKeys)) {
                         utils_1.setCacheHitOutput(true);
+                        core.info("fallback cache restored successfully");
                     }
                 }
             }

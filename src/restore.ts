@@ -45,8 +45,8 @@ async function restoreCache() {
       core.info(`Cache Size: ${formatSize(stat.size)} (${stat.size} bytes)`);
 
       await extractTar(archivePath, compressionMethod);
-      core.info("Cache restored from s3 successfully");
       setCacheHitOutput(true);
+      core.info("Cache restored from s3 successfully");
     } catch (e) {
       core.info("restore s3 cache failed: " + e.message);
       setCacheHitOutput(false);
@@ -54,6 +54,7 @@ async function restoreCache() {
         core.info("restore cache using fallback cache");
         if (await cache.restoreCache(paths, key, restoreKeys)) {
           setCacheHitOutput(true);
+          core.info("fallback cache restored successfully");
         }
       }
     }

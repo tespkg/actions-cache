@@ -76072,8 +76072,9 @@ function saveCache() {
             catch (e) {
                 core.info("save s3 cache failed: " + e.message);
                 if (useFallback) {
-                    core.info("save cache using fallback cache");
+                    core.info("saving cache using fallback");
                     yield cache.saveCache(paths, key);
+                    core.info("save cache using fallback successfully");
                 }
             }
         }
