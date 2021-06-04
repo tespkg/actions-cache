@@ -29,6 +29,7 @@ jobs:
           secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG" # required
           bucket: actions-cache # required
           use-fallback: true # optional, use github actions cache fallback, default true
+
           # actions/cache compatible properties: https://github.com/actions/cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           path: |
