@@ -1,6 +1,6 @@
-name: actions-cache
+name: "s3 cache"
 author: tespkg
-description: zip and upload deps in S3
+description: "S3 actions cache with actions/cache@v2 passthrough"
 inputs:
   endpoint:
     description: "s3 / minio endpoint, see: https://docs.min.io/docs/javascript-client-api-reference.html"
