@@ -1,6 +1,8 @@
 # actions-s3-cache
 
-This action installs dependencies or builds, and caches them in S3.
+This action allows caching dependencies to s3 compatible storage, e.g. minio
+
+It also has github's actions/cache@v2 fallback if s3 save & restore fails
 
 ## Usage
 
