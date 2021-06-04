@@ -50,8 +50,9 @@ async function restoreCache() {
       setCacheHitOutput(false);
       if (useFallback) {
         core.info("restore cache using fallback cache");
-        await cache.restoreCache(paths, key, restoreKeys);
-        setCacheHitOutput(true);
+        if (await cache.restoreCache(paths, key, restoreKeys)) {
+          setCacheHitOutput(true);
+        }
       }
     }
   } catch (e) {

@@ -80218,8 +80218,9 @@ function restoreCache() {
                 utils_1.setCacheHitOutput(false);
                 if (useFallback) {
                     core.info("restore cache using fallback cache");
-                    yield cache.restoreCache(paths, key, restoreKeys);
-                    utils_1.setCacheHitOutput(true);
+                    if (yield cache.restoreCache(paths, key, restoreKeys)) {
+                        utils_1.setCacheHitOutput(true);
+                    }
                 }
             }
         }
