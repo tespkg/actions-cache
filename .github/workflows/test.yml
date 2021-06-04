@@ -77,6 +77,7 @@ jobs:
           secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
           bucket: actions-cache
           key: test-${{ runner.os }}-${{ github.run_id }}
+          use-fallback: false
           path: |
             test-cache
             ~/test-cache

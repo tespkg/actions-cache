@@ -15,6 +15,8 @@ export function getInputAsBoolean(
   name: string,
   options?: core.InputOptions
 ): boolean {
+  var x = Boolean(core.getInput(name, options));
+  core.debug(`${name},${core.getInput(name, options)} ${x}`);
   return Boolean(core.getInput(name, options));
 }
 
