@@ -6321,7 +6321,7 @@ function newMinio() {
 }
 exports.newMinio = newMinio;
 function getInputAsBoolean(name, options) {
-    return Boolean(core.getInput(name, options));
+    return core.getInput(name, options) === "true";
 }
 exports.getInputAsBoolean = getInputAsBoolean;
 function getInputAsArray(name, options) {

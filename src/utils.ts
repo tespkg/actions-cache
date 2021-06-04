@@ -15,7 +15,7 @@ export function getInputAsBoolean(
   name: string,
   options?: core.InputOptions
 ): boolean {
-  return Boolean(core.getInput(name, options));
+  return core.getInput(name, options) === "true";
 }
 
 export function getInputAsArray(
