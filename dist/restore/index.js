@@ -6314,7 +6314,7 @@ function newMinio() {
     return new minio.Client({
         endPoint: core.getInput("endpoint"),
         port: getInputAsInt("port"),
-        useSSL: getInputAsBoolean("insecure"),
+        useSSL: !getInputAsBoolean("insecure"),
         accessKey: core.getInput("accessKey"),
         secretKey: core.getInput("secretKey"),
     });

@@ -24,7 +24,7 @@ jobs:
       - uses: tespkg/actions-cache@v1
         with:
           endpoint: play.min.io # optional, default s3.amazonaws.com
-          insecure: false # optional, default false
+          insecure: false # optional, use http instead of https. default false
           accessKey: "Q3AM3UQ867SPQQA43P2F" # required
           secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG" # required
           bucket: actions-cache # required
