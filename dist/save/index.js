@@ -76057,14 +76057,16 @@ function saveCache() {
                 core.debug("Cache Paths:");
                 core.debug(`${JSON.stringify(cachePaths)}`);
                 const archiveFolder = yield utils.createTempDirectory();
-                const archivePath = path.join(archiveFolder, utils.getCacheFileName(compressionMethod));
+                const cacheFileName = utils.getCacheFileName(compressionMethod);
+                const archivePath = path.join(archiveFolder, cacheFileName);
                 core.debug(`Archive Path: ${archivePath}`);
                 yield tar_1.createTar(archiveFolder, cachePaths, compressionMethod);
                 if (core.isDebug()) {
                     yield tar_1.listTar(archivePath, compressionMethod);
                 }
-                core.info(`Uploading tar to s3. Bucket: ${bucket}, Object: ${key}`);
-                yield mc.fPutObject(bucket, key, archivePath, {});
+                const object = path.join(key, cacheFileName);
+                core.info(`Uploading tar to s3. Bucket: ${bucket}, Object: ${object}`);
+                yield mc.fPutObject(bucket, object, archivePath, {});
                 core.info("Cache saved to s3 successfully");
             }
             catch (e) {

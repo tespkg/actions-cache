@@ -80201,10 +80201,12 @@ function restoreCache() {
             try {
                 const mc = utils_1.newMinio();
                 const compressionMethod = yield utils.getCompressionMethod();
-                const archivePath = path.join(yield utils.createTempDirectory(), utils.getCacheFileName(compressionMethod));
-                core.debug(`downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${key}`);
-                const stat = yield mc.statObject(bucket, key);
-                yield mc.fGetObject(bucket, key, archivePath);
+                const cacheFileName = utils.getCacheFileName(compressionMethod);
+                const archivePath = path.join(yield utils.createTempDirectory(), cacheFileName);
+                const object = path.join(key, cacheFileName);
+                core.debug(`downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${object}`);
+                const stat = yield mc.statObject(bucket, object);
+                yield mc.fGetObject(bucket, object, archivePath);
                 if (core.isDebug()) {
                     yield tar_1.listTar(archivePath, compressionMethod);
                 }

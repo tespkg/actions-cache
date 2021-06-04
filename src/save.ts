@@ -23,10 +23,8 @@ async function saveCache() {
       core.debug(`${JSON.stringify(cachePaths)}`);
 
       const archiveFolder = await utils.createTempDirectory();
-      const archivePath = path.join(
-        archiveFolder,
-        utils.getCacheFileName(compressionMethod)
-      );
+      const cacheFileName = utils.getCacheFileName(compressionMethod);
+      const archivePath = path.join(archiveFolder, cacheFileName);
 
       core.debug(`Archive Path: ${archivePath}`);
 
@@ -35,8 +33,10 @@ async function saveCache() {
         await listTar(archivePath, compressionMethod);
       }
 
-      core.info(`Uploading tar to s3. Bucket: ${bucket}, Object: ${key}`);
-      await mc.fPutObject(bucket, key, archivePath, {});
+      const object = path.join(key, cacheFileName);
+
+      core.info(`Uploading tar to s3. Bucket: ${bucket}, Object: ${object}`);
+      await mc.fPutObject(bucket, object, archivePath, {});
       core.info("Cache saved to s3 successfully");
     } catch (e) {
       core.info("save s3 cache failed: " + e.message);

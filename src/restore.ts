@@ -25,16 +25,18 @@ async function restoreCache() {
       const mc = newMinio();
 
       const compressionMethod = await utils.getCompressionMethod();
+      const cacheFileName = utils.getCacheFileName(compressionMethod);
       const archivePath = path.join(
         await utils.createTempDirectory(),
-        utils.getCacheFileName(compressionMethod)
+        cacheFileName
       );
 
+      const object = path.join(key, cacheFileName);
       core.debug(
-        `downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${key}`
+        `downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${object}`
       );
-      const stat = await mc.statObject(bucket, key);
-      await mc.fGetObject(bucket, key, archivePath);
+      const stat = await mc.statObject(bucket, object);
+      await mc.fGetObject(bucket, object, archivePath);
 
       if (core.isDebug()) {
         await listTar(archivePath, compressionMethod);
