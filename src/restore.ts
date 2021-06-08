@@ -58,6 +58,8 @@ async function restoreCache() {
           setCacheHitOutput(true);
           core.info("Fallback cache restored successfully");
         }
+      } else {
+        throw e;
       }
     }
   } catch (e) {

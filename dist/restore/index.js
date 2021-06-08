@@ -80269,6 +80269,9 @@ function restoreCache() {
                         core.info("Fallback cache restored successfully");
                     }
                 }
+                else {
+                    throw e;
+                }
             }
         }
         catch (e) {
