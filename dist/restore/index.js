@@ -6371,7 +6371,7 @@ function findObject(mc, bucket, keys, compressionMethod) {
         core.debug("Restore keys: " + JSON.stringify(keys));
         for (const key of keys) {
             const fn = utils.getCacheFileName(compressionMethod);
-            core.debug(`Finding object prefixed with ${key}`);
+            core.debug(`Finding object with prefix: ${key}`);
             let objects = yield listObjects(mc, bucket, key);
             objects = objects.filter((o) => o.name.includes(fn));
             if (objects.length < 1) {
