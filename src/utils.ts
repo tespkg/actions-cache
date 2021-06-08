@@ -71,13 +71,14 @@ export async function findObject(
     core.debug(`Finding object with prefix: ${key}`);
     let objects = await listObjects(mc, bucket, key);
     objects = objects.filter((o) => o.name.includes(fn));
+    core.debug(`Found ${JSON.stringify(objects, null, 2)}`);
     if (objects.length < 1) {
       continue;
     }
     const sorted = objects.sort(
       (a, b) => b.lastModified.getTime() - a.lastModified.getTime()
     );
-    core.debug(`Found object ${JSON.stringify(sorted[0])}`);
+    core.debug(`Using latest ${JSON.stringify(sorted[0])}`);
     return sorted[0];
   }
   throw new Error("Cache item not found");

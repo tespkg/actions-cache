@@ -12,7 +12,7 @@ describe("utils", () => {
     const got = await findObject(
       mc,
       "actions-cache",
-      ["test-Linux-"],
+      ["foo.bar", "test-Linux-"],
       await getCompressionMethod()
     );
     expect(got).toBeTruthy();
