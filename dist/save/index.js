@@ -6373,7 +6373,6 @@ function findObject(mc, bucket, keys, compressionMethod) {
             const fn = utils.getCacheFileName(compressionMethod);
             core.debug(`Finding object prefixed with ${key}`);
             let objects = yield listObjects(mc, bucket, key);
-            core.debug(`post Finding object prefixed with ${key}`);
             objects = objects.filter((o) => o.name.includes(fn));
             if (objects.length < 1) {
                 break;
@@ -6382,7 +6381,6 @@ function findObject(mc, bucket, keys, compressionMethod) {
             core.debug(`Found object ${JSON.stringify(sorted[0])}`);
             return sorted[0];
         }
-        core.debug("not found");
         throw new Error("Cache item not found");
     });
 }

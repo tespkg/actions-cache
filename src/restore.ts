@@ -34,6 +34,7 @@ async function restoreCache() {
       const keys = [key, ...restoreKeys];
 
       const obj = await findObject(mc, bucket, keys, compressionMethod);
+      core.debug("found cache object");
       core.info(
         `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
       );
