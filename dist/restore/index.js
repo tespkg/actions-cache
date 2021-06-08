@@ -80281,10 +80281,6 @@ function restoreCache() {
                         core.info("Fallback cache restore failed");
                     }
                 }
-                else {
-                    core.debug("something's wrong: " + JSON.stringify(e));
-                    throw e;
-                }
             }
         }
         catch (e) {
