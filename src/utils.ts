@@ -70,6 +70,7 @@ export async function findObject(
     const fn = utils.getCacheFileName(compressionMethod);
     core.debug(`Finding object prefixed with ${key}`);
     let objects = await listObjects(mc, bucket, key);
+    core.debug(`post Finding object prefixed with ${key}`);
     objects = objects.filter((o) => o.name.includes(fn));
     if (objects.length < 1) {
       break;
