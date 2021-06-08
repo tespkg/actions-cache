@@ -68,6 +68,7 @@ export async function findObject(
   // TODO: compressionMethod needs to be considered
   for (const key of keys) {
     const fn = utils.getCacheFileName(compressionMethod);
+    core.debug(`retrieve object prefixed with ${key}`);
     let objects = await listObjects(mc, bucket, key);
     objects = objects.filter((o) => o.name.includes(fn));
     if (objects.length < 1) {
