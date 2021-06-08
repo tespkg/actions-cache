@@ -77,6 +77,7 @@ export async function findObject(
     const sorted = objects.sort(
       (a, b) => b.lastModified.getTime() - a.lastModified.getTime()
     );
+    core.debug(`Found object ${JSON.stringify(sorted[0])}`);
     return sorted[0];
   }
   throw new Error("Cache item not found");
