@@ -6375,7 +6375,7 @@ function findObject(mc, bucket, keys, compressionMethod) {
             let objects = yield listObjects(mc, bucket, key);
             objects = objects.filter((o) => o.name.includes(fn));
             if (objects.length < 1) {
-                break;
+                continue;
             }
             const sorted = objects.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
             core.debug(`Found object ${JSON.stringify(sorted[0])}`);

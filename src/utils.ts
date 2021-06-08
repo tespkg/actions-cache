@@ -72,7 +72,7 @@ export async function findObject(
     let objects = await listObjects(mc, bucket, key);
     objects = objects.filter((o) => o.name.includes(fn));
     if (objects.length < 1) {
-      break;
+      continue;
     }
     const sorted = objects.sort(
       (a, b) => b.lastModified.getTime() - a.lastModified.getTime()
