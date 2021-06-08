@@ -57,6 +57,8 @@ async function restoreCache() {
         if (await cache.restoreCache(paths, key, restoreKeys)) {
           setCacheHitOutput(true);
           core.info("Fallback cache restored successfully");
+        } else {
+          core.info("Fallback cache restore failed");
         }
       } else {
         throw e;

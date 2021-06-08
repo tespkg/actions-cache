@@ -80268,6 +80268,9 @@ function restoreCache() {
                         utils_1.setCacheHitOutput(true);
                         core.info("Fallback cache restored successfully");
                     }
+                    else {
+                        core.info("Fallback cache restore failed");
+                    }
                 }
                 else {
                     throw e;

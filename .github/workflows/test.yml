@@ -133,7 +133,7 @@ jobs:
           path: |
             test-cache
             ~/test-cache
-          restore-keys: test-
+          restore-keys: test-${{ runner.os }}-
       - name: Verify cache files in working directory
         shell: bash
         run: src/verify-cache-files.sh ${{ runner.os }} test-cache

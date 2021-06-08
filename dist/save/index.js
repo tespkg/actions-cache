@@ -76119,6 +76119,9 @@ function saveCache() {
                     yield cache.saveCache(paths, key);
                     core.info("Save cache using fallback successfully");
                 }
+                else {
+                    core.debug("skipped fallback cache");
+                }
             }
         }
         catch (e) {
