@@ -94,6 +94,7 @@ export function listObjects(
     core.debug("after listObjectsV2");
     const r: minio.BucketItem[] = [];
     h.on("data", (obj) => {
+      core.debug("data :" + JSON.stringify(obj));
       r.push(obj);
     });
     h.on("error", (e) => {

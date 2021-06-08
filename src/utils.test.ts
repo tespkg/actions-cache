@@ -11,7 +11,7 @@ describe("utils", () => {
     });
     // console.log(await mc.bucketExists("actions-cache"));
     // console.log(await mc.makeBucket("actions-cache", "default"));
-    console.log(await listObjects(mc, "actions-cache", "test"));
+    console.log(await listObjects(mc, "actions-cache", "test-Linux"));
   });
   test("getLatestObj", async () => {
     const mc = new minio.Client({
@@ -23,7 +23,7 @@ describe("utils", () => {
       await findObject(
         mc,
         "actions-cache",
-        ["test-"],
+        ["test-Linux"],
         await getCompressionMethod()
       )
     );
