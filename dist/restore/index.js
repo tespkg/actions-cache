@@ -6306,8 +6306,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = void 0;
+exports.listObjects = exports.findObject = exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = void 0;
+const utils = __importStar(__webpack_require__(15));
 const core = __importStar(__webpack_require__(470));
 const minio = __importStar(__webpack_require__(223));
 function newMinio() {
@@ -6356,6 +6366,37 @@ function setCacheHitOutput(isCacheHit) {
     core.setOutput("cache-hit", isCacheHit.toString());
 }
 exports.setCacheHitOutput = setCacheHitOutput;
+function findObject(mc, bucket, keys, compressionMethod) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // TODO: compressionMethod needs to be considered
+        for (const key of keys) {
+            const fn = utils.getCacheFileName(compressionMethod);
+            let objects = yield listObjects(mc, bucket, key);
+            objects = objects.filter((o) => o.name.includes(fn));
+            if (objects.length < 1) {
+                break;
+            }
+            const sorted = objects.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
+            return sorted[0];
+        }
+        throw new Error("Cache item not found");
+    });
+}
+exports.findObject = findObject;
+function listObjects(mc, bucket, prefix) {
+    return new Promise((resolve, reject) => {
+        const h = mc.listObjectsV2(bucket, prefix, true);
+        const r = [];
+        h.on("data", (obj) => {
+            r.push(obj);
+        });
+        h.on("error", reject);
+        h.on("close", () => {
+            resolve(r);
+        });
+    });
+}
+exports.listObjects = listObjects;
 
 
 /***/ }),
@@ -80203,14 +80244,14 @@ function restoreCache() {
                 const compressionMethod = yield utils.getCompressionMethod();
                 const cacheFileName = utils.getCacheFileName(compressionMethod);
                 const archivePath = path.join(yield utils.createTempDirectory(), cacheFileName);
-                const object = path.join(key, cacheFileName);
-                core.info(`downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${object}`);
-                const stat = yield mc.statObject(bucket, object);
-                yield mc.fGetObject(bucket, object, archivePath);
+                const keys = [key, ...restoreKeys];
+                const obj = yield utils_1.findObject(mc, bucket, keys, compressionMethod);
+                core.info(`downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
+                yield mc.fGetObject(bucket, obj.name, archivePath);
                 if (core.isDebug()) {
                     yield tar_1.listTar(archivePath, compressionMethod);
                 }
-                core.info(`Cache Size: ${utils_1.formatSize(stat.size)} (${stat.size} bytes)`);
+                core.info(`Cache Size: ${utils_1.formatSize(obj.size)} (${obj.size} bytes)`);
                 yield tar_1.extractTar(archivePath, compressionMethod);
                 utils_1.setCacheHitOutput(true);
                 core.info("Cache restored from s3 successfully");
