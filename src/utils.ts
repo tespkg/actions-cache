@@ -80,6 +80,7 @@ export async function findObject(
     core.debug(`Found object ${JSON.stringify(sorted[0])}`);
     return sorted[0];
   }
+  core.debug("not found");
   throw new Error("Cache item not found");
 }
 
