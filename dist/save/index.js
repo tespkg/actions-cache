@@ -6387,7 +6387,9 @@ function findObject(mc, bucket, keys, compressionMethod) {
 exports.findObject = findObject;
 function listObjects(mc, bucket, prefix) {
     return new Promise((resolve, reject) => {
+        core.debug("listObjectsV2");
         const h = mc.listObjectsV2(bucket, prefix, true);
+        core.debug("after listObjectsV2");
         const r = [];
         h.on("data", (obj) => {
             r.push(obj);

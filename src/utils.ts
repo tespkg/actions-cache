@@ -89,7 +89,9 @@ export function listObjects(
   prefix: string
 ): Promise<minio.BucketItem[]> {
   return new Promise((resolve, reject) => {
+    core.debug("listObjectsV2");
     const h = mc.listObjectsV2(bucket, prefix, true);
+    core.debug("after listObjectsV2");
     const r: minio.BucketItem[] = [];
     h.on("data", (obj) => {
       r.push(obj);
