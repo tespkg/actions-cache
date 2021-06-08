@@ -38,3 +38,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 ```
+
+## Restore keys
+
+`restore-keys` works similar to how github's `@actions/cache@v2` works: It search each item in `restore-keys`
+as prefix in object names and use the latest one

@@ -108,3 +108,32 @@ jobs:
       - name: Verify cache files outside working directory
         shell: bash
         run: src/verify-cache-files.sh ${{ runner.os }} ~/test-cache
+
+  test-restore-keys:
+    needs: test-save
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Restore cache
+        uses: ./
+        with:
+          endpoint: play.min.io
+          accessKey: "Q3AM3UQ867SPQQA43P2F"
+          secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+          bucket: actions-cache
+          key: test-${{ runner.os }}-${{ github.run_id }}-${{ github.sha }}
+          path: |
+            test-cache
+            ~/test-cache
+          restore-keys: test-
+      - name: Verify cache files in working directory
+        shell: bash
+        run: src/verify-cache-files.sh ${{ runner.os }} test-cache
+      - name: Verify cache files outside working directory
+        shell: bash
+        run: src/verify-cache-files.sh ${{ runner.os }} ~/test-cache

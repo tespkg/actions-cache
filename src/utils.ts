@@ -1,3 +1,5 @@
+import { CompressionMethod } from "@actions/cache/lib/internal/constants";
+import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import * as core from "@actions/core";
 import * as minio from "minio";
 
@@ -55,4 +57,44 @@ export function formatSize(value?: number, format = "bi") {
 
 export function setCacheHitOutput(isCacheHit: boolean): void {
   core.setOutput("cache-hit", isCacheHit.toString());
+}
+
+export async function findObject(
+  mc: minio.Client,
+  bucket: string,
+  keys: string[],
+  compressionMethod: CompressionMethod
+): Promise<minio.BucketItem> {
+  // TODO: compressionMethod needs to be considered
+  for (const key of keys) {
+    const fn = utils.getCacheFileName(compressionMethod);
+    let objects = await listObjects(mc, bucket, key);
+    objects = objects.filter((o) => o.name.includes(fn));
+    if (objects.length < 1) {
+      break;
+    }
+    const sorted = objects.sort(
+      (a, b) => b.lastModified.getTime() - a.lastModified.getTime()
+    );
+    return sorted[0];
+  }
+  throw new Error("Cache item not found");
+}
+
+export function listObjects(
+  mc: minio.Client,
+  bucket: string,
+  prefix: string
+): Promise<minio.BucketItem[]> {
+  return new Promise((resolve, reject) => {
+    const h = mc.listObjectsV2(bucket, prefix, true);
+    const r: minio.BucketItem[] = [];
+    h.on("data", (obj) => {
+      r.push(obj);
+    });
+    h.on("error", reject);
+    h.on("close", () => {
+      resolve(r);
+    });
+  });
 }

@@ -4,6 +4,7 @@ import { extractTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as core from "@actions/core";
 import * as path from "path";
 import {
+  findObject,
   formatSize,
   getInputAsArray,
   getInputAsBoolean,
@@ -30,19 +31,19 @@ async function restoreCache() {
         await utils.createTempDirectory(),
         cacheFileName
       );
+      const keys = [key, ...restoreKeys];
 
-      const object = path.join(key, cacheFileName);
+      const obj = await findObject(mc, bucket, keys, compressionMethod);
       core.info(
-        `downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${object}`
+        `downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
       );
-      const stat = await mc.statObject(bucket, object);
-      await mc.fGetObject(bucket, object, archivePath);
+      await mc.fGetObject(bucket, obj.name, archivePath);
 
       if (core.isDebug()) {
         await listTar(archivePath, compressionMethod);
       }
 
-      core.info(`Cache Size: ${formatSize(stat.size)} (${stat.size} bytes)`);
+      core.info(`Cache Size: ${formatSize(obj.size)} (${obj.size} bytes)`);
 
       await extractTar(archivePath, compressionMethod);
       setCacheHitOutput(true);
