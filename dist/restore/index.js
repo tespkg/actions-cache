@@ -6387,33 +6387,24 @@ function findObject(mc, bucket, keys, compressionMethod) {
 exports.findObject = findObject;
 function listObjects(mc, bucket, prefix) {
     return new Promise((resolve, reject) => {
-        core.debug("listObjectsV2");
         const h = mc.listObjectsV2(bucket, prefix, true);
-        core.debug("after listObjectsV2");
         const r = [];
+        let resolved = false;
         h.on("data", (obj) => {
             r.push(obj);
         });
         h.on("error", (e) => {
-            core.debug("error :" + e.message);
+            resolved = true;
             reject(e);
         });
-        h.on("close", () => {
-            core.debug("close");
+        h.on("end", () => {
+            resolved = true;
             resolve(r);
         });
-        h.on("end", () => {
-            core.debug("end");
-        });
-        h.on("pause", () => {
-            core.debug("pause");
-        });
-        h.on("resume", () => {
-            core.debug("pause");
-        });
-        h.on("readable", () => {
-            core.debug("readable");
-        });
+        setTimeout(() => {
+            if (!resolved)
+                reject(new Error("list objects no result after 10 seconds"));
+        }, 10000);
     });
 }
 exports.listObjects = listObjects;
