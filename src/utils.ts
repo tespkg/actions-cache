@@ -65,10 +65,10 @@ export async function findObject(
   keys: string[],
   compressionMethod: CompressionMethod
 ): Promise<minio.BucketItem> {
-  // TODO: compressionMethod needs to be considered
+  core.debug("Restore keys: " + JSON.stringify(keys));
   for (const key of keys) {
     const fn = utils.getCacheFileName(compressionMethod);
-    core.debug(`retrieve object prefixed with ${key}`);
+    core.debug(`Finding object prefixed with ${key}`);
     let objects = await listObjects(mc, bucket, key);
     objects = objects.filter((o) => o.name.includes(fn));
     if (objects.length < 1) {

@@ -39,11 +39,11 @@ async function saveCache() {
       await mc.fPutObject(bucket, object, archivePath, {});
       core.info("Cache saved to s3 successfully");
     } catch (e) {
-      core.info("save s3 cache failed: " + e.message);
+      core.info("Save s3 cache failed: " + e.message);
       if (useFallback) {
-        core.info("saving cache using fallback");
+        core.info("Saving cache using fallback");
         await cache.saveCache(paths, key);
-        core.info("save cache using fallback successfully");
+        core.info("Save cache using fallback successfully");
       }
     }
   } catch (e) {

@@ -35,7 +35,7 @@ async function restoreCache() {
 
       const obj = await findObject(mc, bucket, keys, compressionMethod);
       core.info(
-        `downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
+        `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
       );
       await mc.fGetObject(bucket, obj.name, archivePath);
 
@@ -49,13 +49,13 @@ async function restoreCache() {
       setCacheHitOutput(true);
       core.info("Cache restored from s3 successfully");
     } catch (e) {
-      core.info("restore s3 cache failed: " + e.message);
+      core.info("Restore s3 cache failed: " + e.message);
       setCacheHitOutput(false);
       if (useFallback) {
-        core.info("restore cache using fallback cache");
+        core.info("Restore cache using fallback cache");
         if (await cache.restoreCache(paths, key, restoreKeys)) {
           setCacheHitOutput(true);
-          core.info("fallback cache restored successfully");
+          core.info("Fallback cache restored successfully");
         }
       }
     }

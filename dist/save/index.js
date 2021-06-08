@@ -6368,10 +6368,10 @@ function setCacheHitOutput(isCacheHit) {
 exports.setCacheHitOutput = setCacheHitOutput;
 function findObject(mc, bucket, keys, compressionMethod) {
     return __awaiter(this, void 0, void 0, function* () {
-        // TODO: compressionMethod needs to be considered
+        core.debug("Restore keys: " + JSON.stringify(keys));
         for (const key of keys) {
             const fn = utils.getCacheFileName(compressionMethod);
-            core.debug(`retrieve object prefixed with ${key}`);
+            core.debug(`Finding object prefixed with ${key}`);
             let objects = yield listObjects(mc, bucket, key);
             objects = objects.filter((o) => o.name.includes(fn));
             if (objects.length < 1) {
@@ -76112,11 +76112,11 @@ function saveCache() {
                 core.info("Cache saved to s3 successfully");
             }
             catch (e) {
-                core.info("save s3 cache failed: " + e.message);
+                core.info("Save s3 cache failed: " + e.message);
                 if (useFallback) {
-                    core.info("saving cache using fallback");
+                    core.info("Saving cache using fallback");
                     yield cache.saveCache(paths, key);
-                    core.info("save cache using fallback successfully");
+                    core.info("Save cache using fallback successfully");
                 }
             }
         }

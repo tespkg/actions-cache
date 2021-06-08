@@ -6368,10 +6368,10 @@ function setCacheHitOutput(isCacheHit) {
 exports.setCacheHitOutput = setCacheHitOutput;
 function findObject(mc, bucket, keys, compressionMethod) {
     return __awaiter(this, void 0, void 0, function* () {
-        // TODO: compressionMethod needs to be considered
+        core.debug("Restore keys: " + JSON.stringify(keys));
         for (const key of keys) {
             const fn = utils.getCacheFileName(compressionMethod);
-            core.debug(`retrieve object prefixed with ${key}`);
+            core.debug(`Finding object prefixed with ${key}`);
             let objects = yield listObjects(mc, bucket, key);
             objects = objects.filter((o) => o.name.includes(fn));
             if (objects.length < 1) {
@@ -80247,7 +80247,7 @@ function restoreCache() {
                 const archivePath = path.join(yield utils.createTempDirectory(), cacheFileName);
                 const keys = [key, ...restoreKeys];
                 const obj = yield utils_1.findObject(mc, bucket, keys, compressionMethod);
-                core.info(`downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
+                core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
                 yield mc.fGetObject(bucket, obj.name, archivePath);
                 if (core.isDebug()) {
                     yield tar_1.listTar(archivePath, compressionMethod);
@@ -80258,13 +80258,13 @@ function restoreCache() {
                 core.info("Cache restored from s3 successfully");
             }
             catch (e) {
-                core.info("restore s3 cache failed: " + e.message);
+                core.info("Restore s3 cache failed: " + e.message);
                 utils_1.setCacheHitOutput(false);
                 if (useFallback) {
-                    core.info("restore cache using fallback cache");
+                    core.info("Restore cache using fallback cache");
                     if (yield cache.restoreCache(paths, key, restoreKeys)) {
                         utils_1.setCacheHitOutput(true);
-                        core.info("fallback cache restored successfully");
+                        core.info("Fallback cache restored successfully");
                     }
                 }
             }
