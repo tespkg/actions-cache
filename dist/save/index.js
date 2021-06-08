@@ -6399,7 +6399,20 @@ function listObjects(mc, bucket, prefix) {
             reject(e);
         });
         h.on("close", () => {
+            core.debug("close");
             resolve(r);
+        });
+        h.on("end", () => {
+            core.debug("end");
+        });
+        h.on("pause", () => {
+            core.debug("pause");
+        });
+        h.on("resume", () => {
+            core.debug("pause");
+        });
+        h.on("readable", () => {
+            core.debug("readable");
         });
     });
 }
