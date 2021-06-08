@@ -80273,6 +80273,7 @@ function restoreCache() {
                     }
                 }
                 else {
+                    core.debug("something's wrong: " + JSON.stringify(e));
                     throw e;
                 }
             }
