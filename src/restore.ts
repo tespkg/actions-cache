@@ -32,7 +32,7 @@ async function restoreCache() {
       );
 
       const object = path.join(key, cacheFileName);
-      core.debug(
+      core.info(
         `downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${object}`
       );
       const stat = await mc.statObject(bucket, object);

@@ -80204,7 +80204,7 @@ function restoreCache() {
                 const cacheFileName = utils.getCacheFileName(compressionMethod);
                 const archivePath = path.join(yield utils.createTempDirectory(), cacheFileName);
                 const object = path.join(key, cacheFileName);
-                core.debug(`downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${object}`);
+                core.info(`downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${object}`);
                 const stat = yield mc.statObject(bucket, object);
                 yield mc.fGetObject(bucket, object, archivePath);
                 if (core.isDebug()) {
