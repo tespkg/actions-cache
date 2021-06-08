@@ -96,7 +96,10 @@ export function listObjects(
     h.on("data", (obj) => {
       r.push(obj);
     });
-    h.on("error", reject);
+    h.on("error", (e) => {
+      core.debug("error :" + e.message);
+      reject(e);
+    });
     h.on("close", () => {
       resolve(r);
     });
