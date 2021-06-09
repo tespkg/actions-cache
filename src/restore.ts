@@ -38,7 +38,13 @@ async function restoreCache() {
       core.info(
         `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
       );
-      await mc.fGetObject(bucket, obj.name, archivePath);
+      // TODO: in some cases, the get object may fail, we should retry
+      for (let i = 0; i < 10; i++) {
+        try {
+          await mc.fGetObject(bucket, obj.name, archivePath);
+          break;
+        } catch {}
+      }
 
       if (core.isDebug()) {
         await listTar(archivePath, compressionMethod);
