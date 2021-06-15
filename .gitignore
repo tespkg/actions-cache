@@ -94,4 +94,3 @@ typings/
 
 # Text editor files
 .vscode/
-src/test.ts
