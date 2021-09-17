@@ -43,3 +43,14 @@ jobs:
 
 `restore-keys` works similar to how github's `@actions/cache@v2` works: It search each item in `restore-keys`
 as prefix in object names and use the latest one
+
+## Amazon S3 permissions
+
+When using this with Amazon S3, the following permissions are necessary:
+
+ - `s3:PutObject`
+ - `s3:GetObject`
+ - `s3:ListBucket`
+ - `s3:GetBucketLocation`
+ - `s3:ListBucketMultipartUploads`
+ - `s3:ListMultipartUploadParts`
