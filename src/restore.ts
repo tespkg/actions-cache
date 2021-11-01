@@ -8,6 +8,7 @@ import {
   formatSize,
   getInputAsArray,
   getInputAsBoolean,
+  isGhes,
   newMinio,
   setCacheHitOutput,
 } from "./utils";
@@ -53,12 +54,16 @@ async function restoreCache() {
       core.info("Restore s3 cache failed: " + e.message);
       setCacheHitOutput(false);
       if (useFallback) {
-        core.info("Restore cache using fallback cache");
-        if (await cache.restoreCache(paths, key, restoreKeys)) {
-          setCacheHitOutput(true);
-          core.info("Fallback cache restored successfully");
+        if (isGhes()) {
+          core.warning('Cache fallback is not supported on Github Enterpise.')
         } else {
-          core.info("Fallback cache restore failed");
+          core.info("Restore cache using fallback cache");
+          if (await cache.restoreCache(paths, key, restoreKeys)) {
+            setCacheHitOutput(true);
+            core.info("Fallback cache restored successfully");
+          } else {
+            core.info("Fallback cache restore failed");
+          }
         }
       }
     }

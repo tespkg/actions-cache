@@ -3,7 +3,7 @@ import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import { createTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as core from "@actions/core";
 import * as path from "path";
-import { getInputAsArray, getInputAsBoolean, newMinio } from "./utils";
+import { getInputAsArray, getInputAsBoolean, isGhes, newMinio } from "./utils";
 
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
 
@@ -41,9 +41,13 @@ async function saveCache() {
     } catch (e) {
       core.info("Save s3 cache failed: " + e.message);
       if (useFallback) {
-        core.info("Saving cache using fallback");
-        await cache.saveCache(paths, key);
-        core.info("Save cache using fallback successfully");
+        if (isGhes()) {
+          core.warning('Cache fallback is not supported on Github Enterpise.');
+        } else {
+          core.info("Saving cache using fallback");
+          await cache.saveCache(paths, key);
+          core.info("Save cache using fallback successfully");
+        }
       } else {
         core.debug("skipped fallback cache");
       }
