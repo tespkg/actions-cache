@@ -11,6 +11,7 @@ import {
   isGhes,
   newMinio,
   setCacheHitOutput,
+  saveMatchedKey,
 } from "./utils";
 
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
@@ -34,8 +35,9 @@ async function restoreCache() {
       );
       const keys = [key, ...restoreKeys];
 
-      const obj = await findObject(mc, bucket, keys, compressionMethod);
+      const { item: obj, matchingKey } = await findObject(mc, bucket, keys, compressionMethod);
       core.debug("found cache object");
+      saveMatchedKey(matchingKey);
       core.info(
         `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
       );
