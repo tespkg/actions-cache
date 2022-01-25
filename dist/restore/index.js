@@ -6316,10 +6316,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listObjects = exports.findObject = exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = void 0;
+exports.listObjects = exports.findObject = exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = exports.isGhes = void 0;
 const utils = __importStar(__webpack_require__(15));
 const core = __importStar(__webpack_require__(470));
 const minio = __importStar(__webpack_require__(223));
+function isGhes() {
+    const ghUrl = new URL(process.env['GITHUB_SERVER_URL'] || 'https://github.com');
+    return ghUrl.hostname.toUpperCase() !== 'GITHUB.COM';
+}
+exports.isGhes = isGhes;
 function newMinio() {
     return new minio.Client({
         endPoint: core.getInput("endpoint"),
@@ -80273,13 +80278,18 @@ function restoreCache() {
                 core.info("Restore s3 cache failed: " + e.message);
                 utils_1.setCacheHitOutput(false);
                 if (useFallback) {
-                    core.info("Restore cache using fallback cache");
-                    if (yield cache.restoreCache(paths, key, restoreKeys)) {
-                        utils_1.setCacheHitOutput(true);
-                        core.info("Fallback cache restored successfully");
+                    if (utils_1.isGhes()) {
+                        core.warning('Cache fallback is not supported on Github Enterpise.');
                     }
                     else {
-                        core.info("Fallback cache restore failed");
+                        core.info("Restore cache using fallback cache");
+                        if (yield cache.restoreCache(paths, key, restoreKeys)) {
+                            utils_1.setCacheHitOutput(true);
+                            core.info("Fallback cache restored successfully");
+                        }
+                        else {
+                            core.info("Fallback cache restore failed");
+                        }
                     }
                 }
             }
