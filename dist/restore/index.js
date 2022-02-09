@@ -6572,10 +6572,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listObjects = exports.findObject = exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = exports.isGhes = void 0;
+exports.isExactKeyMatch = exports.saveMatchedKey = exports.listObjects = exports.findObject = exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = exports.isGhes = void 0;
 const utils = __importStar(__webpack_require__(15));
 const core = __importStar(__webpack_require__(470));
 const minio = __importStar(__webpack_require__(223));
+const state_1 = __webpack_require__(179);
 function isGhes() {
     const ghUrl = new URL(process.env['GITHUB_SERVER_URL'] || 'https://github.com');
     return ghUrl.hostname.toUpperCase() !== 'GITHUB.COM';
@@ -6640,8 +6641,9 @@ function findObject(mc, bucket, keys, compressionMethod) {
                 continue;
             }
             const sorted = objects.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-            core.debug(`Using latest ${JSON.stringify(sorted[0])}`);
-            return sorted[0];
+            const result = { item: sorted[0], matchingKey: key };
+            core.debug(`Using latest ${JSON.stringify(result)}`);
+            return result;
         }
         throw new Error("Cache item not found");
     });
@@ -6670,6 +6672,21 @@ function listObjects(mc, bucket, prefix) {
     });
 }
 exports.listObjects = listObjects;
+function saveMatchedKey(matchedKey) {
+    return core.saveState(state_1.State.MatchedKey, matchedKey);
+}
+exports.saveMatchedKey = saveMatchedKey;
+function getMatchedKey() {
+    return core.getState(state_1.State.MatchedKey);
+}
+function isExactKeyMatch() {
+    const matchedKey = getMatchedKey();
+    const inputKey = core.getInput("key", { required: true });
+    const result = getMatchedKey() === inputKey;
+    core.debug(`isExactKeyMatch: matchedKey=${matchedKey} inputKey=${inputKey}, result=${result}`);
+    return result;
+}
+exports.isExactKeyMatch = isExactKeyMatch;
 
 
 /***/ }),
@@ -6931,7 +6948,20 @@ module.exports = from;
 /***/ }),
 /* 177 */,
 /* 178 */,
-/* 179 */,
+/* 179 */
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.State = void 0;
+var State;
+(function (State) {
+    State["MatchedKey"] = "matched-key";
+})(State = exports.State || (exports.State = {}));
+
+
+/***/ }),
 /* 180 */,
 /* 181 */,
 /* 182 */,
@@ -80811,8 +80841,9 @@ function restoreCache() {
                 const cacheFileName = utils.getCacheFileName(compressionMethod);
                 const archivePath = path.join(yield utils.createTempDirectory(), cacheFileName);
                 const keys = [key, ...restoreKeys];
-                const obj = yield utils_1.findObject(mc, bucket, keys, compressionMethod);
+                const { item: obj, matchingKey } = yield utils_1.findObject(mc, bucket, keys, compressionMethod);
                 core.debug("found cache object");
+                utils_1.saveMatchedKey(matchingKey);
                 core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
                 yield mc.fGetObject(bucket, obj.name, archivePath);
                 if (core.isDebug()) {

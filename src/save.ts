@@ -3,12 +3,17 @@ import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import { createTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as core from "@actions/core";
 import * as path from "path";
-import { getInputAsArray, getInputAsBoolean, isGhes, newMinio } from "./utils";
+import { getInputAsArray, getInputAsBoolean, isGhes, newMinio, isExactKeyMatch } from "./utils";
 
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
 
 async function saveCache() {
   try {
+    if (isExactKeyMatch()) {
+      core.info("Cache was exact key match, not saving");
+      return
+    }
+
     const bucket = core.getInput("bucket", { required: true });
     const key = core.getInput("key", { required: true });
     const useFallback = getInputAsBoolean("use-fallback");

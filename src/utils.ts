@@ -2,6 +2,7 @@ import { CompressionMethod } from "@actions/cache/lib/internal/constants";
 import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import * as core from "@actions/core";
 import * as minio from "minio";
+import {State} from "./state";
 
 export function isGhes(): boolean {
   const ghUrl = new URL(
@@ -66,12 +67,17 @@ export function setCacheHitOutput(isCacheHit: boolean): void {
   core.setOutput("cache-hit", isCacheHit.toString());
 }
 
+type FindObjectResult = {
+  item: minio.BucketItem
+  matchingKey: string
+}
+
 export async function findObject(
   mc: minio.Client,
   bucket: string,
   keys: string[],
   compressionMethod: CompressionMethod
-): Promise<minio.BucketItem> {
+): Promise<FindObjectResult> {
   core.debug("Restore keys: " + JSON.stringify(keys));
   for (const key of keys) {
     const fn = utils.getCacheFileName(compressionMethod);
@@ -85,8 +91,9 @@ export async function findObject(
     const sorted = objects.sort(
       (a, b) => b.lastModified.getTime() - a.lastModified.getTime()
     );
-    core.debug(`Using latest ${JSON.stringify(sorted[0])}`);
-    return sorted[0];
+    const result = { item: sorted[0], matchingKey: key };
+    core.debug(`Using latest ${JSON.stringify(result)}`);
+    return result;
   }
   throw new Error("Cache item not found");
 }
@@ -117,3 +124,20 @@ export function listObjects(
     }, 10000);
   });
 }
+
+export function saveMatchedKey(matchedKey: string) {
+  return core.saveState(State.MatchedKey, matchedKey);
+}
+
+function getMatchedKey() {
+  return core.getState(State.MatchedKey);
+}
+
+export function isExactKeyMatch(): boolean {
+  const matchedKey = getMatchedKey();
+  const inputKey = core.getInput("key", { required: true });
+  const result = getMatchedKey() === inputKey
+  core.debug(`isExactKeyMatch: matchedKey=${matchedKey} inputKey=${inputKey}, result=${result}`)
+  return result
+}
+
