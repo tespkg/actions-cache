@@ -20,7 +20,6 @@ jobs:
     runs-on: [ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v2
       - uses: tespkg/actions-cache@v1
         with:
           endpoint: play.min.io # optional, default s3.amazonaws.com
