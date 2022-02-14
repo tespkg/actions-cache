@@ -18,6 +18,7 @@ export function newMinio() {
     useSSL: !getInputAsBoolean("insecure"),
     accessKey: core.getInput("accessKey"),
     secretKey: core.getInput("secretKey"),
+    sessionToken: core.getInput("sessionToken"),
   });
 }
 
