@@ -18,6 +18,9 @@ inputs:
   secretKey:
     description: s3 / minio secretKey
     required: true
+  sessionToken:
+    description: s3 session token - required when using role
+    required: false
   bucket:
     description: s3 / minio bucket
     required: true
