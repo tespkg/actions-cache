@@ -2,13 +2,13 @@ import { CompressionMethod } from "@actions/cache/lib/internal/constants";
 import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import * as core from "@actions/core";
 import * as minio from "minio";
-import {State} from "./state";
+import { State } from "./state";
 
 export function isGhes(): boolean {
   const ghUrl = new URL(
-    process.env['GITHUB_SERVER_URL'] || 'https://github.com'
+    process.env["GITHUB_SERVER_URL"] || "https://github.com"
   );
-  return ghUrl.hostname.toUpperCase() !== 'GITHUB.COM';
+  return ghUrl.hostname.toUpperCase() !== "GITHUB.COM";
 }
 
 export function newMinio() {
@@ -19,6 +19,7 @@ export function newMinio() {
     accessKey: core.getInput("accessKey"),
     secretKey: core.getInput("secretKey"),
     sessionToken: core.getInput("sessionToken"),
+    region: core.getInput("region"),
   });
 }
 
@@ -53,9 +54,9 @@ export function getInputAsInt(
 
 export function formatSize(value?: number, format = "bi") {
   if (!value) return "";
-  const [multiple, k, suffix] = (format === "bi"
-    ? [1000, "k", "B"]
-    : [1024, "K", "iB"]) as [number, string, string];
+  const [multiple, k, suffix] = (
+    format === "bi" ? [1000, "k", "B"] : [1024, "K", "iB"]
+  ) as [number, string, string];
   const exp = (Math.log(value) / Math.log(multiple)) | 0;
   const size = Number((value / Math.pow(multiple, exp)).toFixed(2));
   return (
@@ -69,9 +70,9 @@ export function setCacheHitOutput(isCacheHit: boolean): void {
 }
 
 type FindObjectResult = {
-  item: minio.BucketItem
-  matchingKey: string
-}
+  item: minio.BucketItem;
+  matchingKey: string;
+};
 
 export async function findObject(
   mc: minio.Client,
@@ -137,8 +138,9 @@ function getMatchedKey() {
 export function isExactKeyMatch(): boolean {
   const matchedKey = getMatchedKey();
   const inputKey = core.getInput("key", { required: true });
-  const result = getMatchedKey() === inputKey
-  core.debug(`isExactKeyMatch: matchedKey=${matchedKey} inputKey=${inputKey}, result=${result}`)
-  return result
+  const result = getMatchedKey() === inputKey;
+  core.debug(
+    `isExactKeyMatch: matchedKey=${matchedKey} inputKey=${inputKey}, result=${result}`
+  );
+  return result;
 }
-
