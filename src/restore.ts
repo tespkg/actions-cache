@@ -3,6 +3,7 @@ import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import { extractTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as core from "@actions/core";
 import * as path from "path";
+import { State } from "./state";
 import {
   findObject,
   formatSize,
@@ -25,6 +26,12 @@ async function restoreCache() {
     const restoreKeys = getInputAsArray("restore-keys");
 
     try {
+      // Inputs are re-evaluted before the post action, so we want to store the original values
+      core.saveState(State.PrimaryKey, key);
+      core.saveState(State.AccessKey, core.getInput("accessKey"));
+      core.saveState(State.SecretKey, core.getInput("secretKey"));
+      core.saveState(State.SessionToken, core.getInput("sessionToken"));
+
       const mc = newMinio();
 
       const compressionMethod = await utils.getCompressionMethod();
