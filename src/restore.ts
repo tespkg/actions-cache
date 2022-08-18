@@ -33,9 +33,8 @@ async function restoreCache() {
         await utils.createTempDirectory(),
         cacheFileName
       );
-      const keys = [key, ...restoreKeys];
 
-      const { item: obj, matchingKey } = await findObject(mc, bucket, keys, compressionMethod);
+      const { item: obj, matchingKey } = await findObject(mc, bucket, key,restoreKeys, compressionMethod);
       core.debug("found cache object");
       saveMatchedKey(matchingKey);
       core.info(

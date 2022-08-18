@@ -6628,20 +6628,29 @@ function setCacheHitOutput(isCacheHit) {
     core.setOutput("cache-hit", isCacheHit.toString());
 }
 exports.setCacheHitOutput = setCacheHitOutput;
-function findObject(mc, bucket, keys, compressionMethod) {
+function findObject(mc, bucket, key, restoreKeys, compressionMethod) {
     return __awaiter(this, void 0, void 0, function* () {
-        core.debug("Restore keys: " + JSON.stringify(keys));
-        for (const key of keys) {
+        core.debug("Key: " + JSON.stringify(key));
+        core.debug("Restore keys: " + JSON.stringify(restoreKeys));
+        core.debug(`Finding exact macth for: ${key}`);
+        const exactMatch = yield listObjects(mc, bucket, key);
+        core.debug(`Found ${JSON.stringify(exactMatch, null, 2)}`);
+        if (exactMatch.length) {
+            const result = { item: exactMatch[0], matchingKey: key };
+            core.debug(`Using ${JSON.stringify(result)}`);
+            return result;
+        }
+        for (const restoreKey of restoreKeys) {
             const fn = utils.getCacheFileName(compressionMethod);
-            core.debug(`Finding object with prefix: ${key}`);
-            let objects = yield listObjects(mc, bucket, key);
+            core.debug(`Finding object with prefix: ${restoreKey}`);
+            let objects = yield listObjects(mc, bucket, restoreKey);
             objects = objects.filter((o) => o.name.includes(fn));
             core.debug(`Found ${JSON.stringify(objects, null, 2)}`);
             if (objects.length < 1) {
                 continue;
             }
             const sorted = objects.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-            const result = { item: sorted[0], matchingKey: key };
+            const result = { item: sorted[0], matchingKey: restoreKey };
             core.debug(`Using latest ${JSON.stringify(result)}`);
             return result;
         }
@@ -82053,8 +82062,7 @@ function restoreCache() {
                 const compressionMethod = yield utils.getCompressionMethod();
                 const cacheFileName = utils.getCacheFileName(compressionMethod);
                 const archivePath = path.join(yield utils.createTempDirectory(), cacheFileName);
-                const keys = [key, ...restoreKeys];
-                const { item: obj, matchingKey } = yield utils_1.findObject(mc, bucket, keys, compressionMethod);
+                const { item: obj, matchingKey } = yield utils_1.findObject(mc, bucket, key, restoreKeys, compressionMethod);
                 core.debug("found cache object");
                 utils_1.saveMatchedKey(matchingKey);
                 core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
