@@ -50,7 +50,7 @@ async function restoreCache() {
       core.info(`Cache Size: ${formatSize(obj.size)} (${obj.size} bytes)`);
 
       await extractTar(archivePath, compressionMethod);
-      setCacheHitOutput(true);
+      setCacheHitOutput(matchingKey === key);
       core.info("Cache restored from s3 successfully");
     } catch (e) {
       core.info("Restore s3 cache failed: " + e.message);
@@ -60,8 +60,9 @@ async function restoreCache() {
           core.warning('Cache fallback is not supported on Github Enterpise.')
         } else {
           core.info("Restore cache using fallback cache");
-          if (await cache.restoreCache(paths, key, restoreKeys)) {
-            setCacheHitOutput(true);
+          const fallbackMatchingKey = await cache.restoreCache(paths, key, restoreKeys)
+          if (fallbackMatchingKey) {
+            setCacheHitOutput(fallbackMatchingKey === key);
             core.info("Fallback cache restored successfully");
           } else {
             core.info("Fallback cache restore failed");
