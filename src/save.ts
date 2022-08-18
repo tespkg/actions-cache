@@ -3,7 +3,8 @@ import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import { createTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as core from "@actions/core";
 import * as path from "path";
-import { getInputAsArray, getInputAsBoolean, isGhes, newMinio, isExactKeyMatch } from "./utils";
+import { State } from "./state";
+import { getInputAsArray, isGhes, newMinio, isExactKeyMatch, getInputAsBoolean } from "./utils";
 
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
 
@@ -15,12 +16,18 @@ async function saveCache() {
     }
 
     const bucket = core.getInput("bucket", { required: true });
-    const key = core.getInput("key", { required: true });
+    // Inputs are re-evaluted before the post action, so we want the original key
+    const key = core.getState(State.PrimaryKey);
     const useFallback = getInputAsBoolean("use-fallback");
     const paths = getInputAsArray("path");
 
     try {
-      const mc = newMinio();
+      const mc = newMinio({
+        // Inputs are re-evaluted before the post action, so we want the original keys & tokens
+        accessKey: core.getState(State.AccessKey),
+        secretKey: core.getState(State.SecretKey),
+        sessionToken: core.getState(State.SessionToken),
+      });
 
       const compressionMethod = await utils.getCompressionMethod();
       const cachePaths = await utils.resolvePaths(paths);

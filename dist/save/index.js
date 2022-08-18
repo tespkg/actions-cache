@@ -6582,14 +6582,14 @@ function isGhes() {
     return ghUrl.hostname.toUpperCase() !== "GITHUB.COM";
 }
 exports.isGhes = isGhes;
-function newMinio() {
+function newMinio({ accessKey, secretKey, sessionToken, } = {}) {
     return new minio.Client({
         endPoint: core.getInput("endpoint"),
         port: getInputAsInt("port"),
         useSSL: !getInputAsBoolean("insecure"),
-        accessKey: core.getInput("accessKey"),
-        secretKey: core.getInput("secretKey"),
-        sessionToken: core.getInput("sessionToken"),
+        accessKey: accessKey !== null && accessKey !== void 0 ? accessKey : core.getInput("accessKey"),
+        secretKey: secretKey !== null && secretKey !== void 0 ? secretKey : core.getInput("secretKey"),
+        sessionToken: sessionToken !== null && sessionToken !== void 0 ? sessionToken : core.getInput("sessionToken"),
         region: core.getInput("region"),
     });
 }
@@ -6690,7 +6690,7 @@ function getMatchedKey() {
 }
 function isExactKeyMatch() {
     const matchedKey = getMatchedKey();
-    const inputKey = core.getInput("key", { required: true });
+    const inputKey = core.getState(state_1.State.PrimaryKey);
     const result = getMatchedKey() === inputKey;
     core.debug(`isExactKeyMatch: matchedKey=${matchedKey} inputKey=${inputKey}, result=${result}`);
     return result;
@@ -6967,6 +6967,10 @@ exports.State = void 0;
 var State;
 (function (State) {
     State["MatchedKey"] = "matched-key";
+    State["PrimaryKey"] = "primary-key";
+    State["AccessKey"] = "access-key";
+    State["SecretKey"] = "secret-key";
+    State["SessionToken"] = "session-token";
 })(State = exports.State || (exports.State = {}));
 
 
@@ -77900,6 +77904,7 @@ const utils = __importStar(__webpack_require__(15));
 const tar_1 = __webpack_require__(447);
 const core = __importStar(__webpack_require__(470));
 const path = __importStar(__webpack_require__(622));
+const state_1 = __webpack_require__(179);
 const utils_1 = __webpack_require__(163);
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
 function saveCache() {
@@ -77910,11 +77915,17 @@ function saveCache() {
                 return;
             }
             const bucket = core.getInput("bucket", { required: true });
-            const key = core.getInput("key", { required: true });
+            // Inputs are re-evaluted before the post action, so we want the original key
+            const key = core.getState(state_1.State.PrimaryKey);
             const useFallback = utils_1.getInputAsBoolean("use-fallback");
             const paths = utils_1.getInputAsArray("path");
             try {
-                const mc = utils_1.newMinio();
+                const mc = utils_1.newMinio({
+                    // Inputs are re-evaluted before the post action, so we want the original keys & tokens
+                    accessKey: core.getState(state_1.State.AccessKey),
+                    secretKey: core.getState(state_1.State.SecretKey),
+                    sessionToken: core.getState(state_1.State.SessionToken),
+                });
                 const compressionMethod = yield utils.getCompressionMethod();
                 const cachePaths = yield utils.resolvePaths(paths);
                 core.debug("Cache Paths:");

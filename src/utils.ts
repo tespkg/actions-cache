@@ -11,14 +11,22 @@ export function isGhes(): boolean {
   return ghUrl.hostname.toUpperCase() !== "GITHUB.COM";
 }
 
-export function newMinio() {
+export function newMinio({
+  accessKey,
+  secretKey,
+  sessionToken,
+}: {
+  accessKey?: string,
+  secretKey?: string,
+  sessionToken?: string,
+} = {}) {
   return new minio.Client({
     endPoint: core.getInput("endpoint"),
     port: getInputAsInt("port"),
     useSSL: !getInputAsBoolean("insecure"),
-    accessKey: core.getInput("accessKey"),
-    secretKey: core.getInput("secretKey"),
-    sessionToken: core.getInput("sessionToken"),
+    accessKey: accessKey ?? core.getInput("accessKey"),
+    secretKey: secretKey ?? core.getInput("secretKey"),
+    sessionToken: sessionToken ?? core.getInput("sessionToken"),
     region: core.getInput("region"),
   });
 }
@@ -150,7 +158,7 @@ function getMatchedKey() {
 
 export function isExactKeyMatch(): boolean {
   const matchedKey = getMatchedKey();
-  const inputKey = core.getInput("key", { required: true });
+  const inputKey = core.getState(State.PrimaryKey);
   const result = getMatchedKey() === inputKey;
   core.debug(
     `isExactKeyMatch: matchedKey=${matchedKey} inputKey=${inputKey}, result=${result}`
