@@ -16,9 +16,9 @@ export function newMinio({
   secretKey,
   sessionToken,
 }: {
-  accessKey?: string,
-  secretKey?: string,
-  sessionToken?: string,
+  accessKey?: string;
+  secretKey?: string;
+  sessionToken?: string;
 } = {}) {
   return new minio.Client({
     endPoint: core.getInput("endpoint"),
@@ -100,7 +100,6 @@ export async function findObject(
     core.debug(`Using ${JSON.stringify(result)}`);
     return result;
   }
-
 
   for (const restoreKey of restoreKeys) {
     const fn = utils.getCacheFileName(compressionMethod);
