@@ -6582,14 +6582,14 @@ function isGhes() {
     return ghUrl.hostname.toUpperCase() !== "GITHUB.COM";
 }
 exports.isGhes = isGhes;
-function newMinio() {
+function newMinio({ accessKey, secretKey, sessionToken, } = {}) {
     return new minio.Client({
         endPoint: core.getInput("endpoint"),
         port: getInputAsInt("port"),
         useSSL: !getInputAsBoolean("insecure"),
-        accessKey: core.getInput("accessKey"),
-        secretKey: core.getInput("secretKey"),
-        sessionToken: core.getInput("sessionToken"),
+        accessKey: accessKey !== null && accessKey !== void 0 ? accessKey : core.getInput("accessKey"),
+        secretKey: secretKey !== null && secretKey !== void 0 ? secretKey : core.getInput("secretKey"),
+        sessionToken: sessionToken !== null && sessionToken !== void 0 ? sessionToken : core.getInput("sessionToken"),
         region: core.getInput("region"),
     });
 }
@@ -6628,20 +6628,29 @@ function setCacheHitOutput(isCacheHit) {
     core.setOutput("cache-hit", isCacheHit.toString());
 }
 exports.setCacheHitOutput = setCacheHitOutput;
-function findObject(mc, bucket, keys, compressionMethod) {
+function findObject(mc, bucket, key, restoreKeys, compressionMethod) {
     return __awaiter(this, void 0, void 0, function* () {
-        core.debug("Restore keys: " + JSON.stringify(keys));
-        for (const key of keys) {
+        core.debug("Key: " + JSON.stringify(key));
+        core.debug("Restore keys: " + JSON.stringify(restoreKeys));
+        core.debug(`Finding exact macth for: ${key}`);
+        const exactMatch = yield listObjects(mc, bucket, key);
+        core.debug(`Found ${JSON.stringify(exactMatch, null, 2)}`);
+        if (exactMatch.length) {
+            const result = { item: exactMatch[0], matchingKey: key };
+            core.debug(`Using ${JSON.stringify(result)}`);
+            return result;
+        }
+        for (const restoreKey of restoreKeys) {
             const fn = utils.getCacheFileName(compressionMethod);
-            core.debug(`Finding object with prefix: ${key}`);
-            let objects = yield listObjects(mc, bucket, key);
+            core.debug(`Finding object with prefix: ${restoreKey}`);
+            let objects = yield listObjects(mc, bucket, restoreKey);
             objects = objects.filter((o) => o.name.includes(fn));
             core.debug(`Found ${JSON.stringify(objects, null, 2)}`);
             if (objects.length < 1) {
                 continue;
             }
             const sorted = objects.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
-            const result = { item: sorted[0], matchingKey: key };
+            const result = { item: sorted[0], matchingKey: restoreKey };
             core.debug(`Using latest ${JSON.stringify(result)}`);
             return result;
         }
@@ -6681,7 +6690,7 @@ function getMatchedKey() {
 }
 function isExactKeyMatch() {
     const matchedKey = getMatchedKey();
-    const inputKey = core.getInput("key", { required: true });
+    const inputKey = core.getState(state_1.State.PrimaryKey);
     const result = getMatchedKey() === inputKey;
     core.debug(`isExactKeyMatch: matchedKey=${matchedKey} inputKey=${inputKey}, result=${result}`);
     return result;
@@ -6958,6 +6967,10 @@ exports.State = void 0;
 var State;
 (function (State) {
     State["MatchedKey"] = "matched-key";
+    State["PrimaryKey"] = "primary-key";
+    State["AccessKey"] = "access-key";
+    State["SecretKey"] = "secret-key";
+    State["SessionToken"] = "session-token";
 })(State = exports.State || (exports.State = {}));
 
 
@@ -82038,6 +82051,7 @@ const utils = __importStar(__webpack_require__(15));
 const tar_1 = __webpack_require__(447);
 const core = __importStar(__webpack_require__(470));
 const path = __importStar(__webpack_require__(622));
+const state_1 = __webpack_require__(179);
 const utils_1 = __webpack_require__(163);
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
 function restoreCache() {
@@ -82049,12 +82063,16 @@ function restoreCache() {
             const paths = utils_1.getInputAsArray("path");
             const restoreKeys = utils_1.getInputAsArray("restore-keys");
             try {
+                // Inputs are re-evaluted before the post action, so we want to store the original values
+                core.saveState(state_1.State.PrimaryKey, key);
+                core.saveState(state_1.State.AccessKey, core.getInput("accessKey"));
+                core.saveState(state_1.State.SecretKey, core.getInput("secretKey"));
+                core.saveState(state_1.State.SessionToken, core.getInput("sessionToken"));
                 const mc = utils_1.newMinio();
                 const compressionMethod = yield utils.getCompressionMethod();
                 const cacheFileName = utils.getCacheFileName(compressionMethod);
                 const archivePath = path.join(yield utils.createTempDirectory(), cacheFileName);
-                const keys = [key, ...restoreKeys];
-                const { item: obj, matchingKey } = yield utils_1.findObject(mc, bucket, keys, compressionMethod);
+                const { item: obj, matchingKey } = yield utils_1.findObject(mc, bucket, key, restoreKeys, compressionMethod);
                 core.debug("found cache object");
                 utils_1.saveMatchedKey(matchingKey);
                 core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
@@ -82064,7 +82082,7 @@ function restoreCache() {
                 }
                 core.info(`Cache Size: ${utils_1.formatSize(obj.size)} (${obj.size} bytes)`);
                 yield tar_1.extractTar(archivePath, compressionMethod);
-                utils_1.setCacheHitOutput(true);
+                utils_1.setCacheHitOutput(matchingKey === key);
                 core.info("Cache restored from s3 successfully");
             }
             catch (e) {
@@ -82076,8 +82094,9 @@ function restoreCache() {
                     }
                     else {
                         core.info("Restore cache using fallback cache");
-                        if (yield cache.restoreCache(paths, key, restoreKeys)) {
-                            utils_1.setCacheHitOutput(true);
+                        const fallbackMatchingKey = yield cache.restoreCache(paths, key, restoreKeys);
+                        if (fallbackMatchingKey) {
+                            utils_1.setCacheHitOutput(fallbackMatchingKey === key);
                             core.info("Fallback cache restored successfully");
                         }
                         else {

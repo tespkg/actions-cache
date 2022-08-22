@@ -3,6 +3,7 @@ import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import { extractTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as core from "@actions/core";
 import * as path from "path";
+import { State } from "./state";
 import {
   findObject,
   formatSize,
@@ -25,6 +26,12 @@ async function restoreCache() {
     const restoreKeys = getInputAsArray("restore-keys");
 
     try {
+      // Inputs are re-evaluted before the post action, so we want to store the original values
+      core.saveState(State.PrimaryKey, key);
+      core.saveState(State.AccessKey, core.getInput("accessKey"));
+      core.saveState(State.SecretKey, core.getInput("secretKey"));
+      core.saveState(State.SessionToken, core.getInput("sessionToken"));
+
       const mc = newMinio();
 
       const compressionMethod = await utils.getCompressionMethod();
@@ -33,9 +40,14 @@ async function restoreCache() {
         await utils.createTempDirectory(),
         cacheFileName
       );
-      const keys = [key, ...restoreKeys];
 
-      const { item: obj, matchingKey } = await findObject(mc, bucket, keys, compressionMethod);
+      const { item: obj, matchingKey } = await findObject(
+        mc,
+        bucket,
+        key,
+        restoreKeys,
+        compressionMethod
+      );
       core.debug("found cache object");
       saveMatchedKey(matchingKey);
       core.info(
@@ -50,18 +62,23 @@ async function restoreCache() {
       core.info(`Cache Size: ${formatSize(obj.size)} (${obj.size} bytes)`);
 
       await extractTar(archivePath, compressionMethod);
-      setCacheHitOutput(true);
+      setCacheHitOutput(matchingKey === key);
       core.info("Cache restored from s3 successfully");
     } catch (e) {
       core.info("Restore s3 cache failed: " + e.message);
       setCacheHitOutput(false);
       if (useFallback) {
         if (isGhes()) {
-          core.warning('Cache fallback is not supported on Github Enterpise.')
+          core.warning("Cache fallback is not supported on Github Enterpise.");
         } else {
           core.info("Restore cache using fallback cache");
-          if (await cache.restoreCache(paths, key, restoreKeys)) {
-            setCacheHitOutput(true);
+          const fallbackMatchingKey = await cache.restoreCache(
+            paths,
+            key,
+            restoreKeys
+          );
+          if (fallbackMatchingKey) {
+            setCacheHitOutput(fallbackMatchingKey === key);
             core.info("Fallback cache restored successfully");
           } else {
             core.info("Fallback cache restore failed");
