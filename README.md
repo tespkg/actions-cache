@@ -54,3 +54,18 @@ When using this with Amazon S3, the following permissions are necessary:
  - `s3:GetBucketLocation`
  - `s3:ListBucketMultipartUploads`
  - `s3:ListMultipartUploadParts`
+
+# Note on release
+
+This project follows semantic versioning. Backward incompatible chagnes will
+increase major version.
+
+There is also the `v1` compatible tag that's always pinned to the latest
+`v1.x.y` release.
+
+It's done using:
+
+```
+git tag -a v1 -f -m "v1 compatible release"
+git push -f --tags
+```
