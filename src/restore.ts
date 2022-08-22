@@ -41,7 +41,13 @@ async function restoreCache() {
         cacheFileName
       );
 
-      const { item: obj, matchingKey } = await findObject(mc, bucket, key,restoreKeys, compressionMethod);
+      const { item: obj, matchingKey } = await findObject(
+        mc,
+        bucket,
+        key,
+        restoreKeys,
+        compressionMethod
+      );
       core.debug("found cache object");
       saveMatchedKey(matchingKey);
       core.info(
@@ -63,10 +69,14 @@ async function restoreCache() {
       setCacheHitOutput(false);
       if (useFallback) {
         if (isGhes()) {
-          core.warning('Cache fallback is not supported on Github Enterpise.')
+          core.warning("Cache fallback is not supported on Github Enterpise.");
         } else {
           core.info("Restore cache using fallback cache");
-          const fallbackMatchingKey = await cache.restoreCache(paths, key, restoreKeys)
+          const fallbackMatchingKey = await cache.restoreCache(
+            paths,
+            key,
+            restoreKeys
+          );
           if (fallbackMatchingKey) {
             setCacheHitOutput(fallbackMatchingKey === key);
             core.info("Fallback cache restored successfully");

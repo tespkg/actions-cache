@@ -4,7 +4,13 @@ import { createTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as core from "@actions/core";
 import * as path from "path";
 import { State } from "./state";
-import { getInputAsArray, isGhes, newMinio, isExactKeyMatch, getInputAsBoolean } from "./utils";
+import {
+  getInputAsArray,
+  isGhes,
+  newMinio,
+  isExactKeyMatch,
+  getInputAsBoolean,
+} from "./utils";
 
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
 
@@ -12,7 +18,7 @@ async function saveCache() {
   try {
     if (isExactKeyMatch()) {
       core.info("Cache was exact key match, not saving");
-      return
+      return;
     }
 
     const bucket = core.getInput("bucket", { required: true });
@@ -54,7 +60,7 @@ async function saveCache() {
       core.info("Save s3 cache failed: " + e.message);
       if (useFallback) {
         if (isGhes()) {
-          core.warning('Cache fallback is not supported on Github Enterpise.');
+          core.warning("Cache fallback is not supported on Github Enterpise.");
         } else {
           core.info("Saving cache using fallback");
           await cache.saveCache(paths, key);
