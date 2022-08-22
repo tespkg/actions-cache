@@ -82090,7 +82090,7 @@ function restoreCache() {
                 utils_1.setCacheHitOutput(false);
                 if (useFallback) {
                     if (utils_1.isGhes()) {
-                        core.warning('Cache fallback is not supported on Github Enterpise.');
+                        core.warning("Cache fallback is not supported on Github Enterpise.");
                     }
                     else {
                         core.info("Restore cache using fallback cache");
