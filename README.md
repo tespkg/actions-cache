@@ -57,7 +57,7 @@ When using this with Amazon S3, the following permissions are necessary:
 
 # Note on release
 
-This project follows semantic versioning. Backward incompatible chagnes will
+This project follows semantic versioning. Backward incompatible changes will
 increase major version.
 
 There is also the `v1` compatible tag that's always pinned to the latest
