@@ -34,8 +34,8 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install Deps
         run: yarn install --pure-lockfile
-      - name: Build & Test
-        run: yarn test
+      # - name: Build & Test
+      #   run: yarn test
       - name: Ensure dist/ folder is up-to-date
         run: |
           yarn build
