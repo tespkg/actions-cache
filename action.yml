@@ -2,31 +2,20 @@ name: "s3 cache"
 author: tespkg
 description: "S3 actions cache with actions/cache@v2 passthrough"
 inputs:
+  provider:
+    description: "Storage provider"
+    required: true
+    default: "s3"
   endpoint:
-    description: "s3 / minio endpoint, see: https://docs.min.io/docs/javascript-client-api-reference.html"
-    required: false
-    default: s3.amazonaws.com
-  region:
-    description: "AWS region"
-    required: false
-  port:
-    description: minio port
-    required: false
-  insecure:
-    description: use insecure http connection to minio
-    required: false
-  accessKey:
-    description: s3 / minio accessKey
-    required: true
-  secretKey:
-    description: s3 / minio secretKey
-    required: true
-  sessionToken:
-    description: s3 session token - required when using role
+    description: "Storage provider endpoint"
     required: false
   bucket:
-    description: s3 / minio bucket
+    description: "Storage backend bucket"
     required: true
+  root:
+    description: "Root directory for all cache files"
+    required: false
+    default: ""
   path:
     description: "A list of files, directories, and wildcard patterns to cache and restore"
     required: true
@@ -40,14 +29,6 @@ inputs:
     description: "Use github actions/cache as fallback"
     required: false
     default: "true"
-  # zip-option:
-  #   description: zip options
-  #   required: false
-  #   default: -ryq
-  # unzip-option:
-  #   description: unzip options
-  #   required: false
-  #   default: -n
 outputs:
   cache-hit:
     description: "A boolean value to indicate an exact match was found for the primary key"

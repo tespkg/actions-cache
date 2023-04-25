@@ -1,19 +1,19 @@
 import { getCompressionMethod } from "@actions/cache/lib/internal/cacheUtils";
-import * as minio from "minio";
+import * as opendal from "opendal";
 import { findObject } from "./utils";
 
 describe("utils", () => {
   test("getLatestObj", async () => {
-    const mc = new minio.Client({
-      endPoint: "play.min.io",
-      accessKey: "Q3AM3UQ867SPQQA43P2F",
-      secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG",
+    const op = new opendal.Operator("s3", {
+      endpoint: "play.min.io",
+      bucket: "actions-cache",
+      accessKeyId: "Q3AM3UQ867SPQQA43P2F",
+      secretAccessKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG",
     });
     const got = await findObject(
-      mc,
-      "actions-cache",
+      op,
       "foo.bar",
-      ["test-Linux-"],
+      ["test/Linux/"],
       await getCompressionMethod()
     );
     expect(got).toBeTruthy();

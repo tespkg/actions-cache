@@ -3,23 +3,28 @@ import * as utils from "@actions/cache/lib/internal/cacheUtils";
 import { extractTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as core from "@actions/core";
 import * as path from "path";
+import { Operator } from "opendal";
 import { State } from "./state";
+import * as fs from "fs";
 import {
   findObject,
   formatSize,
   getInputAsArray,
   getInputAsBoolean,
   isGhes,
-  newMinio,
   setCacheHitOutput,
   saveMatchedKey,
 } from "./utils";
+import axios from "axios";
 
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
 
 async function restoreCache() {
   try {
+    const provider = core.getInput("provider", { required: true });
+    const endpoint = core.getInput("endpoint");
     const bucket = core.getInput("bucket", { required: true });
+    const root = core.getInput("root");
     const key = core.getInput("key", { required: true });
     const useFallback = getInputAsBoolean("use-fallback");
     const paths = getInputAsArray("path");
@@ -28,11 +33,8 @@ async function restoreCache() {
     try {
       // Inputs are re-evaluted before the post action, so we want to store the original values
       core.saveState(State.PrimaryKey, key);
-      core.saveState(State.AccessKey, core.getInput("accessKey"));
-      core.saveState(State.SecretKey, core.getInput("secretKey"));
-      core.saveState(State.SessionToken, core.getInput("sessionToken"));
 
-      const mc = newMinio();
+      const op = new Operator(provider, { endpoint, bucket, root });
 
       const compressionMethod = await utils.getCompressionMethod();
       const cacheFileName = utils.getCacheFileName(compressionMethod);
@@ -41,9 +43,8 @@ async function restoreCache() {
         cacheFileName
       );
 
-      const { item: obj, matchingKey } = await findObject(
-        mc,
-        bucket,
+      const { item: obj, metadata, matchingKey } = await findObject(
+        op,
         key,
         restoreKeys,
         compressionMethod
@@ -51,21 +52,36 @@ async function restoreCache() {
       core.debug("found cache object");
       saveMatchedKey(matchingKey);
       core.info(
-        `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
+        `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, root: ${root}, object: ${obj}`
       );
-      await mc.fGetObject(bucket, obj.name, archivePath);
+      const req = await op.presignRead(obj, 600);
+
+      core.debug(`Presigned request Method: ${req.method}, Url: ${req.url}`);
+      for (const key in req.headers) {
+        core.debug(`Header: ${key}: ${req.headers[key]}`);
+      }
+      const response = await axios({
+        method: req.method,
+        url: req.url,
+        headers: req.headers,
+        responseType: "stream",
+      });
+      await fs.promises.writeFile(archivePath, response.data);
 
       if (core.isDebug()) {
         await listTar(archivePath, compressionMethod);
       }
-
-      core.info(`Cache Size: ${formatSize(obj.size)} (${obj.size} bytes)`);
+      let size = 0;
+      if (metadata?.contentLength) {
+        size = Number(metadata.contentLength);
+      }
+      core.info(`Cache Size: ${formatSize(size)} (${size} bytes)`);
 
       await extractTar(archivePath, compressionMethod);
       setCacheHitOutput(matchingKey === key);
       core.info("Cache restored from s3 successfully");
     } catch (e) {
-      core.info("Restore s3 cache failed: " + e.message);
+      core.info("Restore s3 cache failed: " + e);
       setCacheHitOutput(false);
       if (useFallback) {
         if (isGhes()) {
@@ -87,7 +103,7 @@ async function restoreCache() {
       }
     }
   } catch (e) {
-    core.setFailed(e.message);
+    core.setFailed(`${e}`);
   }
 }
 
