@@ -21,22 +21,58 @@ jobs:
 
     steps:
       - uses: tespkg/actions-cache@v1
+        env:
+          AWS_ACCESS_KEY_ID: Q3AM3UQ867SPQQA43P2F
+          AWS_SECRET_ACCESS_KEY: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
         with:
-          endpoint: play.min.io # optional, default s3.amazonaws.com
-          insecure: false # optional, use http instead of https. default false
-          accessKey: "Q3AM3UQ867SPQQA43P2F" # required
-          secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG" # required
-          sessionToken: "AQoDYXdzEJraDcqRtz123" # optional
+          endpoint: play.min.io # optional
           bucket: actions-cache # required
-          use-fallback: true # optional, use github actions cache fallback, default true
-
-          # actions/cache compatible properties: https://github.com/actions/cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          root: test # optional
+          use-fallback: false # optional, use github actions cache fallback, default false
           path: |
             node_modules
             .cache
+          key: ${{ runner.os }}/yarn/${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}/yarn/
+```
+
+Or you can just call aws-configure before
+
+```yaml
+name: dev ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build_test:
+    runs-on: [ubuntu-latest]
+
+    steps:
+      - name: Configure AWS credentials
+         uses: aws-actions/configure-aws-credentials@v2
+         with:
+           role-duration-seconds: 1500
+           role-to-assume: arn:aws:iam::00000000:role/ci
+           aws-region: us-east-2
+      - uses: everpcpc/actions-cache@v1
+        with:
+          bucket: ci # required
+          root: test # optional
+          path: |
+            node_modules
+            .cache
+          key: ${{ runner.os }}/yarn/${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}/yarn/
 ```
 
 ## Restore keys
