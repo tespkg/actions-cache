@@ -12,6 +12,7 @@ import {
   isGhes,
   newMinio,
   setCacheHitOutput,
+  setCacheSizeOutput,
   saveMatchedKey,
 } from "./utils";
 
@@ -63,6 +64,7 @@ async function restoreCache() {
 
       await extractTar(archivePath, compressionMethod);
       setCacheHitOutput(matchingKey === key);
+      setCacheSizeOutput(obj.size)
       core.info("Cache restored from s3 successfully");
     } catch (e) {
       core.info("Restore s3 cache failed: " + e.message);

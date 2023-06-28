@@ -51,6 +51,8 @@ inputs:
 outputs:
   cache-hit:
     description: "A boolean value to indicate an exact match was found for the primary key"
+  cache-size:
+    description: "A integer value denoting the size of the cache object found (measured in bytes)"
 runs:
   using: node16
   main: "dist/restore/index.js"
