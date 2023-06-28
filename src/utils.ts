@@ -77,6 +77,10 @@ export function setCacheHitOutput(isCacheHit: boolean): void {
   core.setOutput("cache-hit", isCacheHit.toString());
 }
 
+export function setCacheSizeOutput(cacheSize: number): void {
+  core.setOutput("cache-size", cacheSize.toString())
+}
+
 type FindObjectResult = {
   item: minio.BucketItem;
   matchingKey: string;
