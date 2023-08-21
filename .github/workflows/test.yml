@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: "20.x"
       - name: Install Yarn
         run: npm install -g yarn
       - name: Get yarn cache directory path
