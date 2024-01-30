@@ -59,6 +59,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Restore cache
         uses: ./
+        env:
+          AWS_ACCESS_KEY_ID: "Q3AM3UQ867SPQQA43P2F"
+          AWS_SECRET_ACCESS_KEY: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+          # AWS_SESSION_TOKEN: "xxx"
+          AWS_REGION: "us-east-1"
         with:
           endpoint: play.min.io
           bucket: actions-cache
