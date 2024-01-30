@@ -54,7 +54,7 @@ outputs:
   cache-size:
     description: "A integer value denoting the size of the cache object found (measured in bytes)"
 runs:
-  using: node16
+  using: node20
   main: "dist/restore/index.js"
   post: "dist/save/index.js"
   post-if: "success()"
