@@ -14,4 +14,5 @@ if [ -z "$path" ]; then
 fi
 
 mkdir -p $path
+echo -e "File content:\n$prefix $GITHUB_RUN_ID"
 echo "$prefix $GITHUB_RUN_ID" > $path/test-file.txt
