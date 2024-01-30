@@ -39,6 +39,25 @@ jobs:
             ${{ runner.os }}-yarn-
 ```
 
+You can also set env instead of using `with`:
+
+```yaml
+      - uses: tespkg/actions-cache@v1
+        env:
+          AWS_ACCESS_KEY_ID: "Q3AM3UQ867SPQQA43P2F"
+          AWS_SECRET_ACCESS_KEY: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+          # AWS_SESSION_TOKEN: "xxx"
+          AWS_REGION: "us-east-1"
+        with:
+          endpoint: play.min.io
+          bucket: actions-cache
+          use-fallback: false
+          key: test-${{ runner.os }}-${{ github.run_id }}
+          path: |
+            test-cache
+            ~/test-cache
+```
+
 ## Restore keys
 
 `restore-keys` works similar to how github's `@actions/cache@v2` works: It search each item in `restore-keys`
