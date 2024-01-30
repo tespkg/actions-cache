@@ -26,10 +26,12 @@ export function newMinio({
   accessKey,
   secretKey,
   sessionToken,
+  region,
 }: {
   accessKey?: string;
   secretKey?: string;
   sessionToken?: string;
+  region?: string;
 } = {}) {
   return new minio.Client({
     endPoint: core.getInput("endpoint"),
@@ -38,7 +40,7 @@ export function newMinio({
     accessKey: accessKey ?? getInput("accessKey", "AWS_ACCESS_KEY_ID"),
     secretKey: secretKey ?? getInput("secretKey", "AWS_SECRET_ACCESS_KEY"),
     sessionToken: sessionToken ?? getInput("sessionToken", "AWS_SESSION_TOKEN"),
-    region: getInput("region", "AWS_REGION"),
+    region: region ?? getInput("region", "AWS_REGION"),
   });
 }
 
