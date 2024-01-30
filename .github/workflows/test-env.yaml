@@ -1,0 +1,102 @@
+name: test-env
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  create-minio-bucket:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          wget -q https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod a+x mc
+          ./mc mb play/actions-cache || exit 0
+
+  test-save:
+    needs: create-minio-bucket
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate files in working directory
+        shell: bash
+        run: src/create-cache-files.sh ${{ runner.os }} test-cache
+      - name: Generate files outside working directory
+        shell: bash
+        run: src/create-cache-files.sh ${{ runner.os }} ~/test-cache
+      - name: Save cache
+        uses: ./
+        env:
+          AWS_ACCESS_KEY_ID: "Q3AM3UQ867SPQQA43P2F"
+          AWS_SECRET_ACCESS_KEY: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+          AWS_SESSION_TOKEN: "xxx"
+          AWS_REGION: "planet-earth"
+        with:
+          endpoint: play.min.io
+          bucket: actions-cache
+          use-fallback: false
+          key: test-${{ runner.os }}-${{ github.run_id }}
+          path: |
+            test-cache
+            ~/test-cache
+
+  test-restore:
+    needs: test-save
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore cache
+        uses: ./
+        with:
+          endpoint: play.min.io
+          bucket: actions-cache
+          key: test-${{ runner.os }}-${{ github.run_id }}
+          path: |
+            test-cache
+            ~/test-cache
+      - name: Verify cache files in working directory
+        shell: bash
+        run: src/verify-cache-files.sh ${{ runner.os }} test-cache
+      - name: Verify cache files outside working directory
+        shell: bash
+        run: src/verify-cache-files.sh ${{ runner.os }} ~/test-cache
+
+  test-restore-keys:
+    needs: test-save
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore cache
+        uses: ./
+        with:
+          endpoint: play.min.io
+          bucket: actions-cache
+          use-fallback: false
+          key: test-${{ runner.os }}-${{ github.run_id }}-${{ github.sha }}
+          path: |
+            test-cache
+            ~/test-cache
+          restore-keys: test-${{ runner.os }}-
+      - name: Verify cache files in working directory
+        shell: bash
+        run: src/verify-cache-files.sh ${{ runner.os }} test-cache
+      - name: Verify cache files outside working directory
+        shell: bash
+        run: src/verify-cache-files.sh ${{ runner.os }} ~/test-cache

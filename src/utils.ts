@@ -11,6 +11,17 @@ export function isGhes(): boolean {
   return ghUrl.hostname.toUpperCase() !== "GITHUB.COM";
 }
 
+export function getInput(key: string, envKey?: string) {
+  let result;
+  if (envKey) {
+    result = process.env[envKey]
+  }
+  if (result === undefined) {
+    result = core.getInput(key);
+  }
+  return result;
+}
+
 export function newMinio({
   accessKey,
   secretKey,
@@ -24,10 +35,10 @@ export function newMinio({
     endPoint: core.getInput("endpoint"),
     port: getInputAsInt("port"),
     useSSL: !getInputAsBoolean("insecure"),
-    accessKey: accessKey ?? core.getInput("accessKey"),
-    secretKey: secretKey ?? core.getInput("secretKey"),
-    sessionToken: sessionToken ?? core.getInput("sessionToken"),
-    region: core.getInput("region"),
+    accessKey: accessKey ?? getInput("accessKey", "AWS_ACCESS_KEY_ID"),
+    secretKey: secretKey ?? getInput("secretKey", "AWS_SECRET_ACCESS_KEY"),
+    sessionToken: sessionToken ?? getInput("sessionToken", "AWS_SESSION_TOKEN"),
+    region: getInput("region", "AWS_REGION"),
   });
 }
 
