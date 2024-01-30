@@ -33,6 +33,7 @@ async function saveCache() {
         accessKey: core.getState(State.AccessKey),
         secretKey: core.getState(State.SecretKey),
         sessionToken: core.getState(State.SessionToken),
+        region: core.getState(State.Region),
       });
 
       const compressionMethod = await utils.getCompressionMethod();
