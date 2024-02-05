@@ -94,4 +94,5 @@ typings/
 
 # Text editor files
 .vscode/
+.idea/
 src/test.ts
