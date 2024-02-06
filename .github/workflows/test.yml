@@ -140,3 +140,32 @@ jobs:
       - name: Verify cache files outside working directory
         shell: bash
         run: src/verify-cache-files.sh ${{ runner.os }} ~/test-cache
+
+  test-save-only:
+    needs: create-minio-bucket
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate files in working directory
+        shell: bash
+        run: src/create-cache-files.sh ${{ runner.os }} test-cache
+      - name: Generate files outside working directory
+        shell: bash
+        run: src/create-cache-files.sh ${{ runner.os }} ~/test-cache
+      - name: Save cache
+        uses: ./save/
+        with:
+          endpoint: play.min.io
+          accessKey: "Q3AM3UQ867SPQQA43P2F"
+          secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+          bucket: actions-cache
+          use-fallback: false
+          key: test-save-only-${{ runner.os }}-${{ github.run_id }}
+          path: |
+            test-cache
+            ~/test-cache
