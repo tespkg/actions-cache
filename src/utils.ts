@@ -149,21 +149,24 @@ export function listObjects(
     const h = mc.listObjectsV2(bucket, prefix, true);
     const r: minio.BucketItem[] = [];
     let resolved = false;
+    const timeout = setTimeout(() => {
+      if (!resolved)
+        reject(new Error("list objects no result after 10 seconds"));
+    }, 10000);
+
     h.on("data", (obj) => {
       r.push(obj);
     });
     h.on("error", (e) => {
       resolved = true;
       reject(e);
+      clearTimeout(timeout)
     });
     h.on("end", () => {
       resolved = true;
       resolve(r);
+      clearTimeout(timeout)
     });
-    setTimeout(() => {
-      if (!resolved)
-        reject(new Error("list objects no result after 10 seconds"));
-    }, 10000);
   });
 }
 
