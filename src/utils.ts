@@ -232,7 +232,6 @@ export async function saveCache(standalone: boolean) {
       await mc.fPutObject(bucket, object, archivePath, {});
       core.info("Cache saved to s3 successfully");
     } catch (e) {
-      core.info("Save s3 cache failed: " + e.message);
       if (useFallback) {
         if (isGhes()) {
           core.warning("Cache fallback is not supported on Github Enterpise.");
@@ -243,6 +242,7 @@ export async function saveCache(standalone: boolean) {
         }
       } else {
         core.debug("skipped fallback cache");
+        core.warning("Save s3 cache failed: " + e.message);
       }
     }
   } catch (e) {
