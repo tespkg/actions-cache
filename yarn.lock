@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@actions/cache@^3.2.2":
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/@actions/cache/-/cache-3.2.2.tgz#e7bbb5f9b67c613f96f98f91506c69424c9aa288"
-  integrity sha512-6D0Jq5JrLZRQ3VApeQwQkkV20ZZXjXsHNYXd9VjNUdi9E0h93wESpxfMJ2JWLCUCgHNLcfY0v3GjNM+2FdRMlg==
+"@actions/cache@^4.0.3":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@actions/cache/-/cache-4.0.3.tgz#7b08ede6ae2c0b2fb0b7b452ed0f40ba9f0c53d3"
+  integrity sha512-SvrqFtYJ7I48A/uXNkoJrnukx5weQv1fGquhs3+4nkByZThBH109KTIqj5x/cGV7JGNvb8dLPVywUOqX1fjiXg==
   dependencies:
-    "@actions/core" "^1.10.0"
+    "@actions/core" "^1.11.1"
     "@actions/exec" "^1.0.1"
     "@actions/glob" "^0.1.0"
     "@actions/http-client" "^2.1.1"
@@ -15,16 +15,16 @@
     "@azure/abort-controller" "^1.1.0"
     "@azure/ms-rest-js" "^2.6.0"
     "@azure/storage-blob" "^12.13.0"
-    semver "^6.1.0"
-    uuid "^3.3.3"
+    "@protobuf-ts/plugin" "^2.9.4"
+    semver "^6.3.1"
 
-"@actions/core@^1.10.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@actions/core/-/core-1.10.0.tgz#44551c3c71163949a2f06e94d9ca2157a0cfac4f"
-  integrity "sha1-RFUcPHEWOUmi8G6U2cohV6DPrE8= sha512-2aZDDa3zrrZbP5ZYg159sNoLRb61nQ7awl5pSvIq5Qpj81vwDzdMRKzkWJGJuwVvWpvZKx7vspJALyvaaIQyug=="
+"@actions/core@^1.11.1":
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/@actions/core/-/core-1.11.1.tgz#ae683aac5112438021588030efb53b1adb86f172"
+  integrity sha512-hXJCSrkwfA46Vd9Z3q4cpEpHB1rL5NG04+/rbqW9d3+CSvtB1tYe8UTpAlixa1vj0m/ULglfEK2UKxMGxCxv5A==
   dependencies:
+    "@actions/exec" "^1.1.1"
     "@actions/http-client" "^2.0.1"
-    uuid "^8.3.2"
 
 "@actions/core@^1.2.6":
   version "1.9.1"
@@ -38,6 +38,13 @@
   version "1.0.4"
   resolved "https://registry.npmjs.org/@actions/exec/-/exec-1.0.4.tgz"
   integrity "sha1-mddTEOYuWfw30u5tz/bUv/rdOl0= sha512-4DPChWow9yc9W3WqEbUj8Nr86xkpyE29ZzWjXucHItclLbEW6jr80Zx4nqv18QL6KK65+cifiQZXvnqgTV6oHw=="
+  dependencies:
+    "@actions/io" "^1.0.1"
+
+"@actions/exec@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@actions/exec/-/exec-1.1.1.tgz#2e43f28c54022537172819a7cf886c844221a611"
+  integrity sha512-+sCcHHbVdk93a0XT19ECtO/gIXoxvdsgQLzb2fE2/5sIZmWQuluYyjPQtrtTHdU1YzTZ7bAPN4sITq2xi1679w==
   dependencies:
     "@actions/io" "^1.0.1"
 
@@ -850,6 +857,42 @@
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-1.4.1.tgz#ff22eb2e5d476fbc2450a196e40dd243cc20c28f"
   integrity sha512-O2yRJce1GOc6PAy3QxFM4NzFiWzvScDC1/5ihYBL6BUEVdq0XMWN01sppE+H6bBXbaFYipjwFLEWLg5PaSOThA==
+
+"@protobuf-ts/plugin-framework@^2.9.6":
+  version "2.9.6"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/plugin-framework/-/plugin-framework-2.9.6.tgz#33428f4704b849a6177bf6aead6651c65f1362aa"
+  integrity sha512-w7A1RXrDCiVzcaRE6YJP7FCARuAFe/Vc4SNQnHAi4CF0V6mEtyjAYEIC5BNYgIRaJEqB26zzsBQjIem3R02SCA==
+  dependencies:
+    "@protobuf-ts/runtime" "^2.9.6"
+    typescript "^3.9"
+
+"@protobuf-ts/plugin@^2.9.4":
+  version "2.9.6"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/plugin/-/plugin-2.9.6.tgz#289c8c22957960a80c4b4991172434d51a82e3b4"
+  integrity sha512-Wpv5rkXeu6E5Y4r0TjWE0bzRGddiTYl/RM+tLgVlS0r8CqOBqNAmlWv+s8ltf/F75rVrahUal0cpyhFwha9GRA==
+  dependencies:
+    "@protobuf-ts/plugin-framework" "^2.9.6"
+    "@protobuf-ts/protoc" "^2.9.6"
+    "@protobuf-ts/runtime" "^2.9.6"
+    "@protobuf-ts/runtime-rpc" "^2.9.6"
+    typescript "^3.9"
+
+"@protobuf-ts/protoc@^2.9.6":
+  version "2.9.6"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/protoc/-/protoc-2.9.6.tgz#b3d5347ff0684aae73c432a29c09c60344b06af1"
+  integrity sha512-c0XvAPDIBAovH9HxV8gBv8gzOTreQIqibcusrB1+DxvFiSvy+2V1tjbUmG5gJEbjk3aAOaoj0a3+QuE+P28xUw==
+
+"@protobuf-ts/runtime-rpc@^2.9.6":
+  version "2.9.6"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime-rpc/-/runtime-rpc-2.9.6.tgz#b5c11a01f3105ef5df0284fda915168c1c39d8ef"
+  integrity sha512-0UeqDRzNxgsh08lY5eWzFJNfD3gZ8Xf+WG1HzbIAbVAigzigwjwsYNNhTeas5H3gco1U5owTzCg177aambKOOw==
+  dependencies:
+    "@protobuf-ts/runtime" "^2.9.6"
+
+"@protobuf-ts/runtime@^2.9.6":
+  version "2.9.6"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.9.6.tgz#a687ce90d76e053b3b8a3b1abbe99264d2d6bda2"
+  integrity sha512-C0CfpKx4n4LBbUrajOdRj2BTbd3qBoK0SiKWLq7RgCoU6xiN4wesBMFHUOBp3fFzKeZwgU8Q2KtzaqzIvPLRXg==
 
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
@@ -2583,7 +2626,7 @@ sax@>=0.6.0:
   resolved "https://registry.npmjs.org/sax/-/sax-1.2.4.tgz"
   integrity "sha1-KBYjTiN4vdxOU1T6tcqold9xANk= sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw=="
 
-semver@^6.0.0, semver@^6.1.0, semver@^6.3.0, semver@^6.3.1:
+semver@^6.0.0, semver@^6.3.0, semver@^6.3.1:
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity "sha1-VW0u+GiRRuRtzqS/3QlfNDTf/LQ= sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA=="
@@ -2837,6 +2880,11 @@ type-fest@^0.21.3:
   resolved "https://registry.npmjs.org/type-fest/-/type-fest-0.21.3.tgz"
   integrity "sha1-0mCiSwGYQ24TP6JqUkptZfo7Ljc= sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w=="
 
+typescript@^3.9:
+  version "3.9.10"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.10.tgz#70f3910ac7a51ed6bef79da7800690b19bf778b8"
+  integrity sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==
+
 typescript@^5.1.6:
   version "5.1.6"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.6.tgz#02f8ac202b6dad2c0dd5e0913745b47a37998274"
@@ -2865,11 +2913,6 @@ util@^0.12.3:
     is-generator-function "^1.0.7"
     is-typed-array "^1.1.3"
     which-typed-array "^1.1.2"
-
-uuid@^3.3.3:
-  version "3.4.0"
-  resolved "https://registry.npmjs.org/uuid/-/uuid-3.4.0.tgz"
-  integrity "sha1-sj5DWK+oogL+ehAK8fX4g/AgB+4= sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A=="
 
 uuid@^8.3.0, uuid@^8.3.2:
   version "8.3.2"
