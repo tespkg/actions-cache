@@ -109643,6 +109643,7 @@ function restoreCache() {
             const useFallback = (0, utils_1.getInputAsBoolean)("use-fallback");
             const paths = (0, utils_1.getInputAsArray)("path");
             const restoreKeys = (0, utils_1.getInputAsArray)("restore-keys");
+            const lookupOnly = (0, utils_1.getInputAsBoolean)("lookup-only");
             try {
                 // Inputs are re-evaluted before the post action, so we want to store the original values
                 core.saveState(state_1.State.PrimaryKey, key);
@@ -109657,16 +109658,27 @@ function restoreCache() {
                 const { item: obj, matchingKey } = yield (0, utils_1.findObject)(mc, bucket, key, restoreKeys, compressionMethod);
                 core.debug("found cache object");
                 (0, utils_1.saveMatchedKey)(matchingKey);
-                core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
-                yield mc.fGetObject(bucket, obj.name, archivePath);
-                if (core.isDebug()) {
-                    yield (0, tar_1.listTar)(archivePath, compressionMethod);
-                }
-                core.info(`Cache Size: ${(0, utils_1.formatSize)(obj.size)} (${obj.size} bytes)`);
-                yield (0, tar_1.extractTar)(archivePath, compressionMethod);
-                (0, utils_1.setCacheHitOutput)(matchingKey === key);
+                const cacheHit = matchingKey === key;
+                (0, utils_1.setCacheHitOutput)(cacheHit);
                 (0, utils_1.setCacheSizeOutput)(obj.size);
-                core.info("Cache restored from s3 successfully");
+                if (lookupOnly) {
+                    if (cacheHit && obj.size > 0) {
+                        core.info(`Cache Hit. NOT Downloading cache from s3 because lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
+                    }
+                    else {
+                        core.info(`Cache Miss or cache size is 0. NOT Downloading cache from s3 because lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
+                    }
+                }
+                else {
+                    core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
+                    yield mc.fGetObject(bucket, obj.name, archivePath);
+                    if (core.isDebug()) {
+                        yield (0, tar_1.listTar)(archivePath, compressionMethod);
+                    }
+                    core.info(`Cache Size: ${(0, utils_1.formatSize)(obj.size)} (${obj.size} bytes)`);
+                    yield (0, tar_1.extractTar)(archivePath, compressionMethod);
+                    core.info("Cache restored from s3 successfully");
+                }
             }
             catch (e) {
                 core.info("Restore s3 cache failed: " + e.message);

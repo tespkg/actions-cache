@@ -40,6 +40,10 @@ inputs:
     description: "Use github actions/cache as fallback"
     required: false
     default: "true"
+  lookup-only:
+    description: "Check if a restore is successfull but dont download/extract cache."
+    required: false
+    default: "false"
   # zip-option:
   #   description: zip options
   #   required: false
