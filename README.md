@@ -103,8 +103,8 @@ To check if cache hits and size is not zero:
 
       - name: verify cache hit
         env:
-          CACHE_HIT: ${{ steps.cache.cache-hit }}
-          CACHE_SIZE: ${{ steps.cache.cache-size }}
+          CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+          CACHE_SIZE: ${{ steps.cache.outputs.cache-size }}
         run: |
           echo "CACHE_HIT $CACHE_HIT"
           echo "CACHE_SIZE $CACHE_SIZE"

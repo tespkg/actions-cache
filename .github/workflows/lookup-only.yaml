@@ -65,8 +65,8 @@ jobs:
             ~/test-cache
       - name: verify cache hit
         env:
-          CACHE_HIT: ${{ steps.lookup.cache-hit }}
-          CACHE_SIZE: ${{ steps.lookup.cache-size }}
+          CACHE_HIT: ${{ steps.lookup.outputs.cache-hit }}
+          CACHE_SIZE: ${{ steps.lookup.outputs.cache-size }}
         run: |
           echo "CACHE_HIT $CACHE_HIT"
           echo "CACHE_SIZE $CACHE_SIZE"
