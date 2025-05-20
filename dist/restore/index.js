@@ -109643,6 +109643,7 @@ function restoreCache() {
             const useFallback = (0, utils_1.getInputAsBoolean)("use-fallback");
             const paths = (0, utils_1.getInputAsArray)("path");
             const restoreKeys = (0, utils_1.getInputAsArray)("restore-keys");
+            const lookupOnly = core.getInput("lookup-only", { required: false });
             try {
                 // Inputs are re-evaluted before the post action, so we want to store the original values
                 core.saveState(state_1.State.PrimaryKey, key);
@@ -109657,16 +109658,22 @@ function restoreCache() {
                 const { item: obj, matchingKey } = yield (0, utils_1.findObject)(mc, bucket, key, restoreKeys, compressionMethod);
                 core.debug("found cache object");
                 (0, utils_1.saveMatchedKey)(matchingKey);
-                core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
-                yield mc.fGetObject(bucket, obj.name, archivePath);
-                if (core.isDebug()) {
-                    yield (0, tar_1.listTar)(archivePath, compressionMethod);
+                if ("true" === lookupOnly) {
+                    core.info(`NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
+                    (0, utils_1.setCacheHitOutput)(matchingKey === key);
                 }
-                core.info(`Cache Size: ${(0, utils_1.formatSize)(obj.size)} (${obj.size} bytes)`);
-                yield (0, tar_1.extractTar)(archivePath, compressionMethod);
-                (0, utils_1.setCacheHitOutput)(matchingKey === key);
-                (0, utils_1.setCacheSizeOutput)(obj.size);
-                core.info("Cache restored from s3 successfully");
+                else {
+                    core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
+                    yield mc.fGetObject(bucket, obj.name, archivePath);
+                    if (core.isDebug()) {
+                        yield (0, tar_1.listTar)(archivePath, compressionMethod);
+                    }
+                    core.info(`Cache Size: ${(0, utils_1.formatSize)(obj.size)} (${obj.size} bytes)`);
+                    yield (0, tar_1.extractTar)(archivePath, compressionMethod);
+                    (0, utils_1.setCacheHitOutput)(matchingKey === key);
+                    (0, utils_1.setCacheSizeOutput)(obj.size);
+                    core.info("Cache restored from s3 successfully");
+                }
             }
             catch (e) {
                 core.info("Restore s3 cache failed: " + e.message);
