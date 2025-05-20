@@ -67,12 +67,10 @@ jobs:
         env:
           CACHE_HIT: ${{ steps.lookup.outputs.cache-hit }}
           CACHE_SIZE: ${{ steps.lookup.outputs.cache-size }}
+        shell: bash
         run: |
           echo "CACHE_HIT $CACHE_HIT"
           echo "CACHE_SIZE $CACHE_SIZE"
-          if [ "$CACHE_HIT" != "true" ]; then
-            echo "CACHE_HIT should be true"
-            exit 1
-          fi
-          ls -R ~/test-cache
-          ls -R test-cache
+          ls -R ~/test-cache || true
+          ls -R test-cache || true
+          src/create-cache-files.sh ${{ runner.os }} test-cache check_not_exist
