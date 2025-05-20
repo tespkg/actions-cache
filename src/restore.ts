@@ -54,11 +54,13 @@ async function restoreCache() {
       );
       core.debug("found cache object");
       saveMatchedKey(matchingKey);
-      if ("true" === lookupOnly) {
+      if (("true" === lookupOnly) && (matchingKey === key) && (obj.size > 0)) {
         core.info(
           `Cache Hit. NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`
         );
-        setCacheHitOutput(matchingKey === key);
+
+        setCacheHitOutput(true);
+        setCacheSizeOutput(obj.size);
       } else {
         core.info(
           `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`

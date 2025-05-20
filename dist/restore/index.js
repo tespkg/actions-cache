@@ -109658,9 +109658,10 @@ function restoreCache() {
                 const { item: obj, matchingKey } = yield (0, utils_1.findObject)(mc, bucket, key, restoreKeys, compressionMethod);
                 core.debug("found cache object");
                 (0, utils_1.saveMatchedKey)(matchingKey);
-                if ("true" === lookupOnly) {
+                if (("true" === lookupOnly) && (matchingKey === key) && (obj.size > 0)) {
                     core.info(`Cache Hit. NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
-                    (0, utils_1.setCacheHitOutput)(matchingKey === key);
+                    (0, utils_1.setCacheHitOutput)(true);
+                    (0, utils_1.setCacheSizeOutput)(obj.size);
                 }
                 else {
                     core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
