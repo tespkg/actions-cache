@@ -10,7 +10,8 @@
     "@actions/cache": "^4.0.3",
     "@actions/core": "^1.11.1",
     "@types/node": "^20.5.1",
-    "minio": "^7.1.1"
+    "minio": "^7.1.1",
+    "p-retry": "^6.2.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",

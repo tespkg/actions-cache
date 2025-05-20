@@ -6,6 +6,9 @@ import { State } from "./state";
 import path from "path";
 import {createTar, listTar} from "@actions/cache/lib/internal/tar";
 import * as cache from "@actions/cache";
+import * as http from 'node:http'
+import * as https from 'node:https'
+import pRetry from 'p-retry';
 
 export function isGhes(): boolean {
   const ghUrl = new URL(
@@ -44,6 +47,26 @@ export function newMinio({
     secretKey: secretKey ?? getInput("secretKey", "AWS_SECRET_ACCESS_KEY"),
     sessionToken: sessionToken ?? getInput("sessionToken", "AWS_SESSION_TOKEN"),
     region: region ?? getInput("region", "AWS_REGION"),
+    transportAgent: getInputAsBoolean("insecure") ? new http.Agent({
+      timeout: 10000,
+    }) : new https.Agent({
+      timeout: 10000,
+    }),
+  });
+}
+
+export function withRetry<A>(name: string, fn: () => Promise<A>): Promise<A> {
+  return pRetry(fn, {
+    retries: 3,
+    factor: 2,
+    minTimeout: 1000,
+    maxTimeout: 20000,
+    randomize: true,
+    onFailedAttempt: (error) => {
+      core.info(
+        `Failed to ${name}. Attempt ${error.attemptNumber} failed. ${error.message}`
+      );
+    },
   });
 }
 
@@ -229,7 +252,7 @@ export async function saveCache(standalone: boolean) {
       const object = path.join(key, cacheFileName);
 
       core.info(`Uploading tar to s3. Bucket: ${bucket}, Object: ${object}`);
-      await mc.fPutObject(bucket, object, archivePath, {});
+      await withRetry("fPutObject", () => mc.fPutObject(bucket, object, archivePath, {}));
       core.info("Cache saved to s3 successfully");
     } catch (e) {
       if (useFallback) {
