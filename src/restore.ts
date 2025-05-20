@@ -66,10 +66,16 @@ async function restoreCache() {
       const cacheHit = matchingKey === key;
       setCacheHitOutput(cacheHit);
       setCacheSizeOutput(obj.size);
-      if (cacheHit && lookupOnly) {
-        core.info(
-          `Cache Hit. NOT Downloading cache from s3 because lookup-only is set. bucket: ${bucket}, object: ${obj.name}`,
-        );
+      if (lookupOnly) {
+        if (cacheHit && obj.size > 0) {
+          core.info(
+            `Cache Hit. NOT Downloading cache from s3 because lookup-only is set. bucket: ${bucket}, object: ${obj.name}`,
+          );
+        } else {
+          core.info(
+            `Cache Miss or cache size is 0. NOT Downloading cache from s3 because lookup-only is set. bucket: ${bucket}, object: ${obj.name}`,
+          )
+        }
       } else {
         core.info(
           `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`,
