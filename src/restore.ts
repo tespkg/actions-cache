@@ -26,14 +26,23 @@ async function restoreCache() {
     const useFallback = getInputAsBoolean("use-fallback");
     const paths = getInputAsArray("path");
     const restoreKeys = getInputAsArray("restore-keys");
-    const lookupOnly = core.getInput("lookup-only", { required: false });
+    const lookupOnly = getInputAsBoolean("lookup-only");
 
     try {
       // Inputs are re-evaluted before the post action, so we want to store the original values
       core.saveState(State.PrimaryKey, key);
-      core.saveState(State.AccessKey, getInput("accessKey", "AWS_ACCESS_KEY_ID"));
-      core.saveState(State.SecretKey, getInput("secretKey", "AWS_SECRET_ACCESS_KEY"));
-      core.saveState(State.SessionToken, getInput("sessionToken", "AWS_SESSION_TOKEN"));
+      core.saveState(
+        State.AccessKey,
+        getInput("accessKey", "AWS_ACCESS_KEY_ID"),
+      );
+      core.saveState(
+        State.SecretKey,
+        getInput("secretKey", "AWS_SECRET_ACCESS_KEY"),
+      );
+      core.saveState(
+        State.SessionToken,
+        getInput("sessionToken", "AWS_SESSION_TOKEN"),
+      );
       core.saveState(State.Region, getInput("region", "AWS_REGION"));
 
       const mc = newMinio();
@@ -42,7 +51,7 @@ async function restoreCache() {
       const cacheFileName = utils.getCacheFileName(compressionMethod);
       const archivePath = path.join(
         await utils.createTempDirectory(),
-        cacheFileName
+        cacheFileName,
       );
 
       const { item: obj, matchingKey } = await findObject(
@@ -50,20 +59,20 @@ async function restoreCache() {
         bucket,
         key,
         restoreKeys,
-        compressionMethod
+        compressionMethod,
       );
       core.debug("found cache object");
       saveMatchedKey(matchingKey);
-      if (("true" === lookupOnly) && (matchingKey === key) && (obj.size > 0)) {
+      const cacheHit = matchingKey === key;
+      setCacheHitOutput(cacheHit);
+      setCacheSizeOutput(obj.size);
+      if (cacheHit && lookupOnly) {
         core.info(
-          `Cache Hit. NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`
+          `Cache Hit. NOT Downloading cache from s3 because lookup-only is set. bucket: ${bucket}, object: ${obj.name}`,
         );
-
-        setCacheHitOutput(true);
-        setCacheSizeOutput(obj.size);
       } else {
         core.info(
-          `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
+          `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`,
         );
         await mc.fGetObject(bucket, obj.name, archivePath);
 
@@ -74,8 +83,6 @@ async function restoreCache() {
         core.info(`Cache Size: ${formatSize(obj.size)} (${obj.size} bytes)`);
 
         await extractTar(archivePath, compressionMethod);
-        setCacheHitOutput(matchingKey === key);
-        setCacheSizeOutput(obj.size)
         core.info("Cache restored from s3 successfully");
       }
     } catch (e) {
@@ -89,7 +96,7 @@ async function restoreCache() {
           const fallbackMatchingKey = await cache.restoreCache(
             paths,
             key,
-            restoreKeys
+            restoreKeys,
           );
           if (fallbackMatchingKey) {
             setCacheHitOutput(fallbackMatchingKey === key);

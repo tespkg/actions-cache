@@ -109643,7 +109643,7 @@ function restoreCache() {
             const useFallback = (0, utils_1.getInputAsBoolean)("use-fallback");
             const paths = (0, utils_1.getInputAsArray)("path");
             const restoreKeys = (0, utils_1.getInputAsArray)("restore-keys");
-            const lookupOnly = core.getInput("lookup-only", { required: false });
+            const lookupOnly = (0, utils_1.getInputAsBoolean)("lookup-only");
             try {
                 // Inputs are re-evaluted before the post action, so we want to store the original values
                 core.saveState(state_1.State.PrimaryKey, key);
@@ -109658,10 +109658,11 @@ function restoreCache() {
                 const { item: obj, matchingKey } = yield (0, utils_1.findObject)(mc, bucket, key, restoreKeys, compressionMethod);
                 core.debug("found cache object");
                 (0, utils_1.saveMatchedKey)(matchingKey);
-                if (("true" === lookupOnly) && (matchingKey === key) && (obj.size > 0)) {
-                    core.info(`Cache Hit. NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
-                    (0, utils_1.setCacheHitOutput)(true);
-                    (0, utils_1.setCacheSizeOutput)(obj.size);
+                const cacheHit = matchingKey === key;
+                (0, utils_1.setCacheHitOutput)(cacheHit);
+                (0, utils_1.setCacheSizeOutput)(obj.size);
+                if (cacheHit && lookupOnly) {
+                    core.info(`Cache Hit. NOT Downloading cache from s3 because lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
                 }
                 else {
                     core.info(`Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`);
@@ -109671,8 +109672,6 @@ function restoreCache() {
                     }
                     core.info(`Cache Size: ${(0, utils_1.formatSize)(obj.size)} (${obj.size} bytes)`);
                     yield (0, tar_1.extractTar)(archivePath, compressionMethod);
-                    (0, utils_1.setCacheHitOutput)(matchingKey === key);
-                    (0, utils_1.setCacheSizeOutput)(obj.size);
                     core.info("Cache restored from s3 successfully");
                 }
             }
