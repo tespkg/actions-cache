@@ -86,6 +86,31 @@ To restore from the cache only:
             node_modules
 ```
 
+To check if cache hits and size is not zero:
+
+```yaml
+      - name: Check cache
+        id: cache
+        uses: tespkg/actions-cache/check@v1
+        with:
+          accessKey: "Q3AM3UQ867SPQQA43P2F" # required
+          secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG" # required
+          bucket: actions-cache # required
+          lookup-only: true
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+
+      - name: verify cache hit
+        env:
+          CACHE_HIT: ${{ steps.cache.cache-hit }}
+          CACHE_SIZE: ${{ steps.cache.cache-size }}
+        run: |
+          echo "CACHE_HIT $CACHE_HIT"
+          echo "CACHE_SIZE $CACHE_SIZE"
+```
+
+
 ## Restore keys
 
 `restore-keys` works similar to how github's `@actions/cache@v2` works: It search each item in `restore-keys`
