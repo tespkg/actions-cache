@@ -109659,7 +109659,7 @@ function restoreCache() {
                 core.debug("found cache object");
                 (0, utils_1.saveMatchedKey)(matchingKey);
                 if ("true" === lookupOnly) {
-                    core.info(`NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
+                    core.info(`Cache Hit. NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
                     (0, utils_1.setCacheHitOutput)(matchingKey === key);
                 }
                 else {

@@ -56,7 +56,7 @@ async function restoreCache() {
       saveMatchedKey(matchingKey);
       if ("true" === lookupOnly) {
         core.info(
-          `NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`
+          `Cache Hit. NOT Downloading cache from s3, lookup-only is set. bucket: ${bucket}, object: ${obj.name}`
         );
         setCacheHitOutput(matchingKey === key);
       } else {
