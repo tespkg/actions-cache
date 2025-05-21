@@ -47,27 +47,22 @@ export function newMinio({
     secretKey: secretKey ?? getInput("secretKey", "AWS_SECRET_ACCESS_KEY"),
     sessionToken: sessionToken ?? getInput("sessionToken", "AWS_SESSION_TOKEN"),
     region: region ?? getInput("region", "AWS_REGION"),
-    transportAgent: getInputAsBoolean("insecure") ? new http.Agent({
-      timeout: 10000,
-    }) : new https.Agent({
-      timeout: 10000,
-    }),
   });
 }
 
 export function withRetry<A>(name: string, fn: () => Promise<A>): Promise<A> {
-  return pRetry(fn, {
-    retries: 3,
-    factor: 2,
-    minTimeout: 1000,
-    maxTimeout: 20000,
-    randomize: true,
-    onFailedAttempt: (error) => {
-      core.info(
-        `Failed to ${name}. Attempt ${error.attemptNumber} failed. ${error.message}`
-      );
-    },
-  });
+  if (getInputAsBoolean("retry")) {
+    return pRetry(fn, {
+      retries: getInputAsInt("retry-count") ?? 3,
+      onFailedAttempt: (error) => {
+        core.info(
+          `Failed to ${name}. Attempt ${error.attemptNumber} failed. ${error.message}`
+        );
+      },
+    });
+  } else {
+    return fn();
+  }
 }
 
 export function getInputAsBoolean(
