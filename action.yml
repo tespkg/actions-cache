@@ -51,7 +51,7 @@ inputs:
   retry-count:
     description: "Number of times to retry the minio operation in case of failure"
     required: false
-    default: "0"
+    default: "3"
   # zip-option:
   #   description: zip options
   #   required: false
