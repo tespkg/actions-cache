@@ -37,6 +37,14 @@ inputs:
     description: "Use github actions/cache as fallback"
     required: false
     default: "true"
+  retry:
+    description: "Number of retries to perform on failure"
+    required: false
+    default: "false"
+  retry-count:
+    description: "Number of times to retry the minio operation in case of failure"
+    required: false
+    default: "3"
   # zip-option:
   #   description: zip options
   #   required: false

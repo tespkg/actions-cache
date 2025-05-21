@@ -44,6 +44,14 @@ inputs:
     description: "Check if a restore is successfull but dont download/extract cache."
     required: false
     default: "false"
+  retry:
+    description: "Number of retries to perform on failure"
+    required: false
+    default: "false"
+  retry-count:
+    description: "Number of times to retry the minio operation in case of failure"
+    required: false
+    default: "3"
   # zip-option:
   #   description: zip options
   #   required: false
