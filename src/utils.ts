@@ -6,8 +6,6 @@ import { State } from "./state";
 import path from "path";
 import {createTar, listTar} from "@actions/cache/lib/internal/tar";
 import * as cache from "@actions/cache";
-import * as http from 'node:http'
-import * as https from 'node:https'
 import pRetry from 'p-retry';
 
 export function isGhes(): boolean {
