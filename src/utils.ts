@@ -4,7 +4,7 @@ import * as core from "@actions/core";
 import * as minio from "minio";
 import { State } from "./state";
 import path from "path";
-import {createTar, listTar} from "@actions/cache/lib/internal/tar";
+import { createTar, listTar } from "@actions/cache/lib/internal/tar";
 import * as cache from "@actions/cache";
 
 export function isGhes(): boolean {
@@ -234,7 +234,10 @@ export async function saveCache(standalone: boolean) {
 
       core.debug(`Archive Path: ${archivePath}`);
 
+      // REPLACE START
+      core.info(`TIME [START createTar]: ${new Date().toISOString()}`);
       await createTar(archiveFolder, cachePaths, compressionMethod);
+      core.info(`TIME [END createTar]: ${new Date().toISOString()}`);
       if (core.isDebug()) {
         await listTar(archivePath, compressionMethod);
       }
@@ -242,7 +245,10 @@ export async function saveCache(standalone: boolean) {
       const object = path.join(key, cacheFileName);
 
       core.info(`Uploading tar to s3. Bucket: ${bucket}, Object: ${object}`);
+      core.info(`TIME [START fPutObject]: ${new Date().toISOString()}`);
       await mc.fPutObject(bucket, object, archivePath, {});
+      core.info(`TIME [END fPutObject]: ${new Date().toISOString()}`);
+      // REPLACE END
       core.info("Cache saved to s3 successfully");
     } catch (e) {
       core.info("Save s3 cache failed: " + (e as Error).message);

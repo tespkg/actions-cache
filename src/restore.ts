@@ -78,7 +78,11 @@ async function restoreCache() {
       core.info(
         `Downloading cache from s3 to ${archivePath}. bucket: ${bucket}, object: ${obj.name}`
       );
+      // REPLACE START
+      // print out current time
+      core.info(`TIME [START fGetObject]: ${new Date().toISOString()}`);
       await mc.fGetObject(bucket, obj.name, archivePath);
+      core.info(`TIME [END fGetObject]: ${new Date().toISOString()}`);
 
       if (core.isDebug()) {
         await listTar(archivePath, compressionMethod);
@@ -86,7 +90,11 @@ async function restoreCache() {
 
       core.info(`Cache Size: ${formatSize(obj.size)} (${obj.size} bytes)`);
 
+      core.info(`TIME [START extractTar]: ${new Date().toISOString()}`);
       await extractTar(archivePath, compressionMethod);
+      core.info(`TIME [END extractTar]: ${new Date().toISOString()}`);
+      // REPLACE END
+
       setCacheHitOutput(matchingKey === key);
       setCacheSizeOutput(obj.size)
       core.info("Cache restored from s3 successfully");
