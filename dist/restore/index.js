@@ -109854,7 +109854,7 @@ function findObject(mc, bucket, key, restoreKeys, compressionMethod) {
         const keyMatches = yield listObjects(mc, bucket, key);
         core.debug(`Found ${JSON.stringify(keyMatches, null, 2)}`);
         if (keyMatches.length > 0) {
-            const exactMatch = keyMatches.find((obj) => obj.name === key);
+            const exactMatch = keyMatches.find((obj) => obj.name.startsWith(key));
             if (exactMatch) {
                 const result = { item: exactMatch, matchingKey: key };
                 core.debug(`Found an exact match; using ${JSON.stringify(result)}`);
