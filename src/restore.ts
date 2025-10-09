@@ -13,6 +13,7 @@ import {
   newMinio,
   setCacheHitOutput,
   setCacheSizeOutput,
+  setCacheMatchedKeyOutput,
   saveMatchedKey,
   getInput,
 } from "./utils";
@@ -66,6 +67,7 @@ async function restoreCache() {
       const cacheHit = matchingKey === key;
       setCacheHitOutput(cacheHit);
       setCacheSizeOutput(obj.size);
+      setCacheMatchedKeyOutput(matchingKey);
       if (lookupOnly) {
         if (cacheHit && obj.size > 0) {
           core.info(
@@ -106,6 +108,7 @@ async function restoreCache() {
           );
           if (fallbackMatchingKey) {
             setCacheHitOutput(fallbackMatchingKey === key);
+            setCacheMatchedKeyOutput(fallbackMatchingKey);
             core.info("Fallback cache restored successfully");
           } else {
             core.info("Fallback cache restore failed");
