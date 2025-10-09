@@ -109687,7 +109687,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.saveCache = exports.isExactKeyMatch = exports.saveMatchedKey = exports.listObjects = exports.findObject = exports.setCacheSizeOutput = exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = exports.getInput = exports.isGhes = void 0;
+exports.saveCache = exports.isExactKeyMatch = exports.saveMatchedKey = exports.listObjects = exports.findObject = exports.setCacheMatchedKeyOutput = exports.setCacheSizeOutput = exports.setCacheHitOutput = exports.formatSize = exports.getInputAsInt = exports.getInputAsArray = exports.getInputAsBoolean = exports.newMinio = exports.getInput = exports.isGhes = void 0;
 const utils = __importStar(__nccwpck_require__(1518));
 const core = __importStar(__nccwpck_require__(2186));
 const minio = __importStar(__nccwpck_require__(8308));
@@ -109761,6 +109761,10 @@ function setCacheSizeOutput(cacheSize) {
     core.setOutput("cache-size", cacheSize.toString());
 }
 exports.setCacheSizeOutput = setCacheSizeOutput;
+function setCacheMatchedKeyOutput(cacheMatchedKey) {
+    core.setOutput("cache-matched-key", cacheMatchedKey);
+}
+exports.setCacheMatchedKeyOutput = setCacheMatchedKeyOutput;
 function findObject(mc, bucket, key, restoreKeys, compressionMethod) {
     return __awaiter(this, void 0, void 0, function* () {
         core.debug("Key: " + JSON.stringify(key));
