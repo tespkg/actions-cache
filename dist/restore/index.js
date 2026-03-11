@@ -86081,6 +86081,7 @@ function restoreCache() {
                 const cacheHit = matchingKey === key;
                 (0, utils_1.setCacheHitOutput)(cacheHit);
                 (0, utils_1.setCacheSizeOutput)(obj.size);
+                (0, utils_1.setCacheMatchedKeyOutput)(matchingKey);
                 if (lookupOnly) {
                     if (cacheHit && obj.size > 0) {
                         core.info(`Cache Hit. NOT Downloading cache from s3 because lookup-only is set. bucket: ${bucket}, object: ${obj.name}`);
@@ -86103,6 +86104,7 @@ function restoreCache() {
             catch (e) {
                 core.info("Restore s3 cache failed: " + e.message);
                 (0, utils_1.setCacheHitOutput)(false);
+                (0, utils_1.setCacheMatchedKeyOutput)("");
                 if (useFallback) {
                     if ((0, utils_1.isGhes)()) {
                         core.warning("Cache fallback is not supported on Github Enterpise.");
@@ -86112,6 +86114,7 @@ function restoreCache() {
                         const fallbackMatchingKey = yield cache.restoreCache(paths, key, restoreKeys);
                         if (fallbackMatchingKey) {
                             (0, utils_1.setCacheHitOutput)(fallbackMatchingKey === key);
+                            (0, utils_1.setCacheMatchedKeyOutput)(fallbackMatchingKey);
                             core.info("Fallback cache restored successfully");
                         }
                         else {
@@ -86212,6 +86215,7 @@ exports.getInputAsInt = getInputAsInt;
 exports.formatSize = formatSize;
 exports.setCacheHitOutput = setCacheHitOutput;
 exports.setCacheSizeOutput = setCacheSizeOutput;
+exports.setCacheMatchedKeyOutput = setCacheMatchedKeyOutput;
 exports.findObject = findObject;
 exports.listObjects = listObjects;
 exports.saveMatchedKey = saveMatchedKey;
@@ -86295,6 +86299,9 @@ function setCacheHitOutput(isCacheHit) {
 }
 function setCacheSizeOutput(cacheSize) {
     core.setOutput("cache-size", cacheSize.toString());
+}
+function setCacheMatchedKeyOutput(cacheMatchedKey) {
+    core.setOutput("cache-matched-key", cacheMatchedKey);
 }
 function findObject(mc, bucket, key, restoreKeys, compressionMethod) {
     return __awaiter(this, void 0, void 0, function* () {

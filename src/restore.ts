@@ -12,6 +12,7 @@ import {
   isGhes,
   newMinio,
   setCacheHitOutput,
+  setCacheMatchedKeyOutput,
   setCacheSizeOutput,
   saveMatchedKey,
   getInput,
@@ -67,6 +68,7 @@ async function restoreCache() {
       const cacheHit = matchingKey === key;
       setCacheHitOutput(cacheHit);
       setCacheSizeOutput(obj.size);
+      setCacheMatchedKeyOutput(matchingKey);
       if (lookupOnly) {
         if (cacheHit && obj.size > 0) {
           core.info(
@@ -95,6 +97,7 @@ async function restoreCache() {
     } catch (e) {
       core.info("Restore s3 cache failed: " + e.message);
       setCacheHitOutput(false);
+      setCacheMatchedKeyOutput("");
       if (useFallback) {
         if (isGhes()) {
           core.warning("Cache fallback is not supported on Github Enterpise.");
@@ -107,6 +110,7 @@ async function restoreCache() {
           );
           if (fallbackMatchingKey) {
             setCacheHitOutput(fallbackMatchingKey === key);
+            setCacheMatchedKeyOutput(fallbackMatchingKey);
             core.info("Fallback cache restored successfully");
           } else {
             core.info("Fallback cache restore failed");
