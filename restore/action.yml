@@ -60,7 +60,7 @@ outputs:
   cache-matched-key:
     description: "The key of the cache object found, if any"
 runs:
-  using: node20
+  using: node24
   main: "../dist/restore/index.js"
 branding:
   icon: "archive"
