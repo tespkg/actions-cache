@@ -132,7 +132,7 @@ export async function findObject(
   const keyMatches = await listObjects(mc, bucket, key);
   core.debug(`Found ${JSON.stringify(keyMatches, null, 2)}`);
   if (keyMatches.length > 0) {
-    const exactMatch = keyMatches.find((obj) => obj.name?.startsWith(key + "/"));
+    const exactMatch = keyMatches.find((obj) => obj.name?.startsWith(key + path.sep));
     if (exactMatch) {
       const result = { item: exactMatch, matchingKey: key };
       core.debug(`Found an exact match; using ${JSON.stringify(result)}`);

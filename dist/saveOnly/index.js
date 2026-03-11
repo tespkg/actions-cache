@@ -86219,7 +86219,7 @@ function findObject(mc, bucket, key, restoreKeys, compressionMethod) {
         const keyMatches = yield listObjects(mc, bucket, key);
         core.debug(`Found ${JSON.stringify(keyMatches, null, 2)}`);
         if (keyMatches.length > 0) {
-            const exactMatch = keyMatches.find((obj) => { var _a; return (_a = obj.name) === null || _a === void 0 ? void 0 : _a.startsWith(key + "/"); });
+            const exactMatch = keyMatches.find((obj) => { var _a; return (_a = obj.name) === null || _a === void 0 ? void 0 : _a.startsWith(key + path_1.default.sep); });
             if (exactMatch) {
                 const result = { item: exactMatch, matchingKey: key };
                 core.debug(`Found an exact match; using ${JSON.stringify(result)}`);
