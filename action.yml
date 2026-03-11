@@ -65,6 +65,8 @@ outputs:
     description: "A boolean value to indicate an exact match was found for the primary key"
   cache-size:
     description: "A integer value denoting the size of the cache object found (measured in bytes)"
+  cache-matched-key:
+    description: "The key of the cache object found, if any"
 runs:
   using: node24
   main: "dist/restore/index.js"

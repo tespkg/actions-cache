@@ -113,6 +113,10 @@ export function setCacheSizeOutput(cacheSize: number): void {
   core.setOutput("cache-size", cacheSize.toString())
 }
 
+export function setCacheMatchedKeyOutput(cacheMatchedKey: string): void {
+  core.setOutput("cache-matched-key", cacheMatchedKey)
+}
+
 type FindObjectResult = {
   item: minio.BucketItem;
   matchingKey: string;

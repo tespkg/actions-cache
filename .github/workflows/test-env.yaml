@@ -52,6 +52,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Restore cache
+        id: restore
         uses: ./
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
@@ -65,6 +66,17 @@ jobs:
           path: |
             test-cache
             ~/test-cache
+      - name: Verify cache-matched-key output
+        if: steps.restore.outputs.cache-hit == 'true'
+        shell: bash
+        env:
+          CACHE_MATCHED_KEY: ${{ steps.restore.outputs.cache-matched-key }}
+          EXPECTED_KEY: test-${{ runner.os }}-${{ github.run_id }}
+        run: |
+          if [ "$CACHE_MATCHED_KEY" != "$EXPECTED_KEY" ]; then
+            echo "cache-matched-key mismatch: got '$CACHE_MATCHED_KEY', expected '$EXPECTED_KEY'"
+            exit 1
+          fi
       - name: Verify cache files in working directory
         shell: bash
         run: src/verify-cache-files.sh ${{ runner.os }} test-cache

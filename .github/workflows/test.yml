@@ -49,6 +49,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Restore cache
+        id: restore
         uses: ./
         with:
           endpoint: ${{ secrets.ENDPOINT }}
@@ -60,6 +61,17 @@ jobs:
           path: |
             test-cache
             ~/test-cache
+      - name: Verify cache-matched-key output
+        if: steps.restore.outputs.cache-hit == 'true'
+        shell: bash
+        env:
+          CACHE_MATCHED_KEY: ${{ steps.restore.outputs.cache-matched-key }}
+          EXPECTED_KEY: test-${{ runner.os }}-${{ github.run_id }}
+        run: |
+          if [ "$CACHE_MATCHED_KEY" != "$EXPECTED_KEY" ]; then
+            echo "cache-matched-key mismatch: got '$CACHE_MATCHED_KEY', expected '$EXPECTED_KEY'"
+            exit 1
+          fi
       - name: Verify cache files in working directory
         shell: bash
         run: src/verify-cache-files.sh ${{ runner.os }} test-cache
@@ -78,6 +90,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Restore cache
+        id: restore-keys
         uses: ./
         with:
           endpoint: ${{ secrets.ENDPOINT }}
@@ -90,6 +103,13 @@ jobs:
             test-cache
             ~/test-cache
           restore-keys: test-${{ runner.os }}-
+      - name: Verify cache-matched-key output
+        if: steps.restore-keys.outputs.cache-matched-key != ''
+        shell: bash
+        env:
+          CACHE_MATCHED_KEY: ${{ steps.restore-keys.outputs.cache-matched-key }}
+        run: |
+          echo "cache-matched-key is set to: $CACHE_MATCHED_KEY"
       - name: Verify cache files in working directory
         shell: bash
         run: src/verify-cache-files.sh ${{ runner.os }} test-cache
@@ -199,6 +219,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Restore cache
+        id: restore-only
         uses: ./restore/
         with:
           endpoint: ${{ secrets.ENDPOINT }}
@@ -210,6 +231,17 @@ jobs:
           path: |
             test-cache
             ~/test-cache
+      - name: Verify cache-matched-key output
+        if: steps.restore-only.outputs.cache-hit == 'true'
+        shell: bash
+        env:
+          CACHE_MATCHED_KEY: ${{ steps.restore-only.outputs.cache-matched-key }}
+          EXPECTED_KEY: test-save-only-${{ runner.os }}-${{ github.run_id }}
+        run: |
+          if [ "$CACHE_MATCHED_KEY" != "$EXPECTED_KEY" ]; then
+            echo "cache-matched-key mismatch: got '$CACHE_MATCHED_KEY', expected '$EXPECTED_KEY'"
+            exit 1
+          fi
       - name: Verify cache files in working directory
         shell: bash
         run: src/verify-cache-files.sh ${{ runner.os }} test-cache

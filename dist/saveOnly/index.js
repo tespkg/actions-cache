@@ -86127,6 +86127,7 @@ exports.getInputAsInt = getInputAsInt;
 exports.formatSize = formatSize;
 exports.setCacheHitOutput = setCacheHitOutput;
 exports.setCacheSizeOutput = setCacheSizeOutput;
+exports.setCacheMatchedKeyOutput = setCacheMatchedKeyOutput;
 exports.findObject = findObject;
 exports.listObjects = listObjects;
 exports.saveMatchedKey = saveMatchedKey;
@@ -86210,6 +86211,9 @@ function setCacheHitOutput(isCacheHit) {
 }
 function setCacheSizeOutput(cacheSize) {
     core.setOutput("cache-size", cacheSize.toString());
+}
+function setCacheMatchedKeyOutput(cacheMatchedKey) {
+    core.setOutput("cache-matched-key", cacheMatchedKey);
 }
 function findObject(mc, bucket, key, restoreKeys, compressionMethod) {
     return __awaiter(this, void 0, void 0, function* () {

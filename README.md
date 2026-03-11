@@ -117,6 +117,27 @@ To check if cache hits and size is not zero without downloading:
 `restore-keys` works similar to how github's `@actions/cache@v5` works: It search each item in `restore-keys`
 as prefix in object names and use the latest one
 
+To restore from the cache using a `restore-key` prefix if the `key` restore fails:
+
+```yaml
+      - uses: tespkg/actions-cache/restore@v1
+        with:
+          accessKey: "Q3AM3UQ867SPQQA43P2F" # required
+          secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG" # required
+          bucket: actions-cache # required
+          # actions/cache compatible properties: https://github.com/actions/cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-
+          path: |
+            node_modules
+```
+
+If a match is found using one of the `restore-keys` options, then `cache-hit` will be FALSE but the
+`cache-matched-key` output will be set to the key that matched. See the
+[actions/cache](https://github.com/actions/cache/blob/main/restore/README.md#outputs) notes.
+
 ## Amazon S3 permissions
 
 When using this with Amazon S3, the following permissions are necessary:
