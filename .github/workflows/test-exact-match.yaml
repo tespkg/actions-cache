@@ -1,7 +1,9 @@
 name: test-exact-match
 
 on:
-  push:
+  workflow_run:
+    workflows: [build]
+    types: [completed]
     branches: [main]
   pull_request:
     branches: [main]
@@ -11,6 +13,7 @@ jobs:
   # e.g. key = "test-exact-Linux-12345-decoy" which shares the prefix
   # "test-exact-Linux-12345" with the key we'll try to restore later.
   test-save-decoy:
+    if: github.event_name == 'pull_request' || github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         os: [ubuntu-latest]

@@ -6,13 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -24,7 +23,7 @@ jobs:
         run: npm install -g yarn
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
       - uses: actions/cache@v5
         id: yarn-cache
         with:
@@ -34,14 +33,17 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install Deps
         run: yarn install --pure-lockfile
-      # - name: Build & Test
-      #   run: yarn test
-      - name: Ensure dist/ folder is up-to-date
+      - name: Build
+        run: yarn build
+      - name: Commit dist/ changes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          yarn build
-          if [ "$(git diff --ignore-space-at-eol | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build.  See status below:"
-            git diff
-            exit 1
+          git add dist/
+          if git diff --cached --quiet; then
+            echo "dist/ is up to date, nothing to commit"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: update dist/ build artifacts"
+            git push
           fi
-

@@ -1,13 +1,16 @@
 name: test-env
 
 on:
-  push:
+  workflow_run:
+    workflows: [build]
+    types: [completed]
     branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
   test-save:
+    if: github.event_name == 'pull_request' || github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]

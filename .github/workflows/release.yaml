@@ -1,0 +1,27 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update-major-tag:
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.release.tag_name, 'v')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update major version tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          # Extract major version (e.g., v1.9.0 -> v1)
+          MAJOR_TAG="${RELEASE_TAG%%.*}"
+          echo "Moving ${MAJOR_TAG} tag to ${RELEASE_TAG}"
+          git tag -fa "${MAJOR_TAG}" -m "${MAJOR_TAG} compatible release"
+          git push -f origin "${MAJOR_TAG}"

@@ -1,13 +1,16 @@
 name: test
 
 on:
-  push:
+  workflow_run:
+    workflows: [build]
+    types: [completed]
     branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
   test-save:
+    if: github.event_name == 'pull_request' || github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
@@ -95,6 +98,7 @@ jobs:
         run: src/verify-cache-files.sh ${{ runner.os }} ~/test-cache
 
   test-save-retry:
+    if: github.event_name == 'pull_request' || github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
@@ -156,6 +160,7 @@ jobs:
         run: src/verify-cache-files.sh ${{ runner.os }} ~/test-cache
 
   test-save-only:
+    if: github.event_name == 'pull_request' || github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macOS-latest ]
