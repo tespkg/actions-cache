@@ -128,14 +128,18 @@ export async function findObject(
   core.debug("Key: " + JSON.stringify(key));
   core.debug("Restore keys: " + JSON.stringify(restoreKeys));
 
-  core.debug(`Finding exact macth for: ${key}`);
-  const exactMatch = await listObjects(mc, bucket, key);
-  core.debug(`Found ${JSON.stringify(exactMatch, null, 2)}`);
-  if (exactMatch.length) {
-    const result = { item: exactMatch[0], matchingKey: key };
-    core.debug(`Using ${JSON.stringify(result)}`);
-    return result;
+  core.debug(`Finding exact match for: ${key}`);
+  const keyMatches = await listObjects(mc, bucket, key);
+  core.debug(`Found ${JSON.stringify(keyMatches, null, 2)}`);
+  if (keyMatches.length > 0) {
+    const exactMatch = keyMatches.find((obj) => obj.name?.startsWith(key + "/"));
+    if (exactMatch) {
+      const result = { item: exactMatch, matchingKey: key };
+      core.debug(`Found an exact match; using ${JSON.stringify(result)}`);
+      return result;
+    }
   }
+  core.debug(`Didn't find an exact match`);
 
   for (const restoreKey of restoreKeys) {
     const fn = utils.getCacheFileName(compressionMethod);

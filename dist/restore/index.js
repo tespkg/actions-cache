@@ -86300,14 +86300,18 @@ function findObject(mc, bucket, key, restoreKeys, compressionMethod) {
     return __awaiter(this, void 0, void 0, function* () {
         core.debug("Key: " + JSON.stringify(key));
         core.debug("Restore keys: " + JSON.stringify(restoreKeys));
-        core.debug(`Finding exact macth for: ${key}`);
-        const exactMatch = yield listObjects(mc, bucket, key);
-        core.debug(`Found ${JSON.stringify(exactMatch, null, 2)}`);
-        if (exactMatch.length) {
-            const result = { item: exactMatch[0], matchingKey: key };
-            core.debug(`Using ${JSON.stringify(result)}`);
-            return result;
+        core.debug(`Finding exact match for: ${key}`);
+        const keyMatches = yield listObjects(mc, bucket, key);
+        core.debug(`Found ${JSON.stringify(keyMatches, null, 2)}`);
+        if (keyMatches.length > 0) {
+            const exactMatch = keyMatches.find((obj) => { var _a; return (_a = obj.name) === null || _a === void 0 ? void 0 : _a.startsWith(key + "/"); });
+            if (exactMatch) {
+                const result = { item: exactMatch, matchingKey: key };
+                core.debug(`Found an exact match; using ${JSON.stringify(result)}`);
+                return result;
+            }
         }
+        core.debug(`Didn't find an exact match`);
         for (const restoreKey of restoreKeys) {
             const fn = utils.getCacheFileName(compressionMethod);
             core.debug(`Finding object with prefix: ${restoreKey}`);

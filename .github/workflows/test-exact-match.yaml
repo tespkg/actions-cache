@@ -1,0 +1,73 @@
+name: test-exact-match
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Save a "decoy" cache whose key is a prefix-extension of the exact key.
+  # e.g. key = "test-exact-Linux-12345-decoy" which shares the prefix
+  # "test-exact-Linux-12345" with the key we'll try to restore later.
+  test-save-decoy:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate decoy cache files
+        shell: bash
+        run: src/create-cache-files.sh ${{ runner.os }} test-cache
+      - name: Save decoy cache
+        uses: ./
+        with:
+          endpoint: ${{ secrets.ENDPOINT }}
+          accessKey: ${{ secrets.ACCESS_KEY }}
+          secretKey: ${{ secrets.SECRET_KEY }}
+          bucket: ${{ secrets.BUCKET }}
+          use-fallback: false
+          key: test-exact-${{ runner.os }}-${{ github.run_id }}-decoy
+          path: test-cache
+
+  # Try to restore with the shorter key that is a prefix of the decoy key.
+  # With correct exact matching this must NOT match the decoy.
+  test-exact-no-false-positive:
+    needs: test-save-decoy
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore cache (should miss)
+        id: restore
+        uses: ./
+        with:
+          endpoint: ${{ secrets.ENDPOINT }}
+          accessKey: ${{ secrets.ACCESS_KEY }}
+          secretKey: ${{ secrets.SECRET_KEY }}
+          bucket: ${{ secrets.BUCKET }}
+          use-fallback: false
+          key: test-exact-${{ runner.os }}-${{ github.run_id }}
+          path: test-cache
+      - name: Verify cache was NOT restored
+        shell: bash
+        env:
+          CACHE_HIT: ${{ steps.restore.outputs.cache-hit }}
+        run: |
+          echo "cache-hit=$CACHE_HIT"
+          if [ "$CACHE_HIT" = "true" ]; then
+            echo "FAIL: cache-hit should not be true — decoy was incorrectly matched"
+            exit 1
+          fi
+          if [ -e test-cache/test-file.txt ]; then
+            echo "FAIL: test-file.txt should not exist — decoy files were restored"
+            exit 1
+          fi
+          echo "PASS: exact match correctly rejected the decoy"
