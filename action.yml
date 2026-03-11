@@ -45,7 +45,7 @@ inputs:
     required: false
     default: "false"
   retry:
-    description: "Number of retries to perform on failure"
+    description: "Enable retry on failure for S3 operations"
     required: false
     default: "false"
   retry-count:
