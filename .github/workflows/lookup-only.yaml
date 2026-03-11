@@ -67,10 +67,17 @@ jobs:
         env:
           CACHE_HIT: ${{ steps.lookup.outputs.cache-hit }}
           CACHE_SIZE: ${{ steps.lookup.outputs.cache-size }}
+          CACHE_MATCHED_KEY: ${{ steps.lookup.outputs.cache-matched-key }}
+          EXPECTED_KEY: test-${{ runner.os }}-${{ github.run_id }}
         shell: bash
         run: |
           echo "CACHE_HIT $CACHE_HIT"
           echo "CACHE_SIZE $CACHE_SIZE"
+          echo "CACHE_MATCHED_KEY $CACHE_MATCHED_KEY"
+          if [ "$CACHE_MATCHED_KEY" != "$EXPECTED_KEY" ]; then
+            echo "cache-matched-key mismatch: got '$CACHE_MATCHED_KEY', expected '$EXPECTED_KEY'"
+            exit 1
+          fi
           ls -R ~/test-cache || true
           ls -R test-cache || true
           src/create-cache-files.sh ${{ runner.os }} test-cache check_not_exist
