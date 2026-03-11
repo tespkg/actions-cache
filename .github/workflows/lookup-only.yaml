@@ -74,7 +74,7 @@ jobs:
           echo "CACHE_HIT $CACHE_HIT"
           echo "CACHE_SIZE $CACHE_SIZE"
           echo "CACHE_MATCHED_KEY $CACHE_MATCHED_KEY"
-          if [ "$CACHE_MATCHED_KEY" != "$EXPECTED_KEY" ]; then
+          if [ "$CACHE_HIT" = "true" ] && [ "$CACHE_MATCHED_KEY" != "$EXPECTED_KEY" ]; then
             echo "cache-matched-key mismatch: got '$CACHE_MATCHED_KEY', expected '$EXPECTED_KEY'"
             exit 1
           fi

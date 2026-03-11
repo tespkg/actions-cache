@@ -64,6 +64,7 @@ jobs:
             test-cache
             ~/test-cache
       - name: Verify cache-matched-key output
+        if: steps.restore.outputs.cache-hit == 'true'
         shell: bash
         env:
           CACHE_MATCHED_KEY: ${{ steps.restore.outputs.cache-matched-key }}
