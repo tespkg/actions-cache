@@ -2,7 +2,7 @@
 
 This action enables caching dependencies to s3 compatible storage, e.g. minio, AWS S3
 
-It also has github [actions/cache@v2](https://github.com/actions/cache) fallback if s3 save & restore fails
+It also has github [actions/cache@v5](https://github.com/actions/cache) fallback if s3 save & restore fails
 
 ## Usage
 
@@ -114,7 +114,7 @@ To check if cache hits and size is not zero without downloading:
 
 ## Restore keys
 
-`restore-keys` works similar to how github's `@actions/cache@v2` works: It search each item in `restore-keys`
+`restore-keys` works similar to how github's `@actions/cache@v5` works: It search each item in `restore-keys`
 as prefix in object names and use the latest one
 
 ## Amazon S3 permissions

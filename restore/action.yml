@@ -1,6 +1,6 @@
 name: "s3 cache"
 author: tespkg
-description: "S3 actions cache with actions/cache@v2 passthrough"
+description: "S3 actions cache with actions/cache@v5 passthrough"
 inputs:
   endpoint:
     description: "s3 / minio endpoint, see: https://docs.min.io/docs/javascript-client-api-reference.html"
@@ -66,7 +66,7 @@ outputs:
   cache-size:
     description: "A integer value denoting the size of the cache object found (measured in bytes)"
 runs:
-  using: node20
+  using: node24
   main: "../dist/restore/index.js"
 branding:
   icon: "archive"
