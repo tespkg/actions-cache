@@ -44,6 +44,10 @@ inputs:
     description: "Check if a restore is successfull but dont download/extract cache."
     required: false
     default: "false"
+  restore-only:
+    description: "Restore a cache but don't attempt to save it"
+    required: false
+    default: "false"
   retry:
     description: "Enable retry on failure for S3 operations"
     required: false
