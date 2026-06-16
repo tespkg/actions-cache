@@ -17,10 +17,10 @@ inputs:
     required: false
   accessKey:
     description: s3 / minio accessKey
-    required: true
+    required: false
   secretKey:
     description: s3 / minio secretKey
-    required: true
+    required: false
   sessionToken:
     description: s3 session token - required when using role
     required: false
