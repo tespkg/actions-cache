@@ -87,6 +87,21 @@ To restore from the cache only:
             node_modules
 ```
 
+To restore from the cache only (dynamically):
+
+```yaml
+      - uses: tespkg/actions-cache@v1
+        with:
+          accessKey: "Q3AM3UQ867SPQQA43P2F" # required
+          secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG" # required
+          bucket: actions-cache # required
+          restore-only: true
+          # actions/cache compatible properties: https://github.com/actions/cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+```
+
 To check if cache hits and size is not zero without downloading:
 
 ```yaml
