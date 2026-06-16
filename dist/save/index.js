@@ -86041,7 +86041,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(42186));
 const utils_1 = __nccwpck_require__(71314);
 process.on("uncaughtException", (e) => core.info("warning: " + e.message));
-(0, utils_1.saveCache)(false);
+const restoreOnly = (0, utils_1.getInputAsBoolean)("restore-only");
+if (!restoreOnly) {
+    (0, utils_1.saveCache)(false);
+}
 
 
 /***/ }),
